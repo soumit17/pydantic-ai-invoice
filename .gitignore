@@ -1,0 +1,19 @@
+# Python-generated files
+__pycache__/
+*.py[oc]
+build/
+dist/
+wheels/
+*.egg-info
+
+# Virtual environments
+.venv
+
+# InvoiceIQ
+.env
+data/*
+!data/ground_truth/
+runs/
+.coverage
+.pytest_cache/
+.ruff_cache/

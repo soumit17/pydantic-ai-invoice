@@ -1,0 +1,61 @@
+[project]
+name = "invoiceiq"
+version = "0.1.0"
+description = "InvoiceIQ: GST invoice intelligence on Pydantic AI V2 (agentic frameworks lab, P1)"
+authors = [
+    { name = "Soumit", email = "soumit_bhowmick@hotmail.com" }
+]
+requires-python = ">=3.12"
+# Exact pins (spec Rule 19.2). Pydantic AI ships weekly; bump deliberately and re-run the API check.
+dependencies = [
+    "aiosqlite==0.22.1",
+    "faker==40.44.0",
+    "fastapi==0.162.0",
+    "httpx==0.28.1",
+    "mcp==2.3.0",
+    "pillow==13.0.0",
+    "pydantic-ai-slim[anthropic,evals,logfire,mcp]==2.63.0",
+    "pydantic-evals==2.63.0",
+    "pydantic-graph==2.63.0",
+    "pydantic-settings==2.16.2",
+    "pypdfium2==5.14.0",
+    "reportlab==5.1.0",
+    "sse-starlette==3.6.0",
+    "typer==0.27.3",
+    "uvicorn[standard]==0.54.0",
+]
+
+[project.scripts]
+invoiceiq = "invoiceiq:main"
+
+[build-system]
+requires = ["uv_build>=0.13.1,<0.14.0"]
+build-backend = "uv_build"
+
+[dependency-groups]
+dev = [
+    "pyright==1.1.414",
+    "pytest==9.2.0",
+    "pytest-asyncio==1.4.1",
+    "pytest-cov==7.1.0",
+    "ruff==0.17.3",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+addopts = "-q"
+
+[tool.pyright]
+include = ["src"]
+typeCheckingMode = "strict"
+pythonVersion = "3.12"
+venvPath = "."
+venv = ".venv"
+
+[tool.ruff]
+line-length = 110
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "SIM"]
