@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import os
+from datetime import date
 from functools import lru_cache
 from pathlib import Path
 
@@ -35,6 +36,10 @@ class Settings(BaseSettings):
     auto_approve_limit_inr: int = 50_000
     price_drift_pct: float = 5.0
 
+    # Mock data is dated relative to 2026-10-29. Pinning "today" keeps date checks and evals
+    # reproducible; leave it unset to use the real date.
+    as_of_date: date | None = None
+
     logfire_token: SecretStr | None = None
 
     data_dir: Path = PROJECT_ROOT / "data"
@@ -43,6 +48,13 @@ class Settings(BaseSettings):
     @property
     def costs_path(self) -> Path:
         return self.runs_dir / "costs.jsonl"
+
+    @property
+    def ledger_path(self) -> Path:
+        return self.data_dir / "ledger.sqlite"
+
+    def today(self) -> date:
+        return self.as_of_date or date.today()
 
 
 @lru_cache

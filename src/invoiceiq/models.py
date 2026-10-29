@@ -1,0 +1,197 @@
+"""Domain models (spec §6).
+
+Two invoice models, on purpose (spec §7.1 ⚠️):
+- `RawInvoice` is lenient: the numbers exactly as printed, with only format validation. It is the
+  extractor's output type, so a vendor's arithmetic mistake survives extraction instead of being
+  "fixed" by the model during a validation retry.
+- `Invoice` is strict: the same data, plus the arithmetic and GST-type rules from `gst.py`. The
+  pipeline's `strict_validate` step turns those rule failures into findings.
+"""
+
+from __future__ import annotations
+
+from datetime import date
+from decimal import Decimal
+from typing import Annotated, Literal
+
+from pydantic import BaseModel, Field, model_validator
+
+from invoiceiq import gst
+
+GSTIN = Annotated[str, Field(pattern=gst.GSTIN_PATTERN)]
+Money = Annotated[Decimal, Field(max_digits=14, decimal_places=2)]
+GstRate = Literal[0, 5, 12, 18, 28]
+Currency = Literal["INR", "USD", "EUR"]
+Severity = Literal["info", "warning", "critical"]
+FindingKind = Literal[
+    "exact_duplicate",
+    "fuzzy_duplicate",
+    "price_drift",
+    "unknown_vendor",
+    "blocked_vendor",
+    "gst_type_mismatch",
+    "math_error",
+    "stale_date",
+    "fx_unverified",
+]
+DecisionOutcome = Literal["auto_approved", "awaiting_approval", "held", "rejected"]
+
+
+# --- Extraction ---------------------------------------------------------------------------------
+
+
+class Party(BaseModel):
+    name: str
+    gstin: GSTIN | None = None
+    address: str | None = None
+
+    @property
+    def state_code(self) -> str | None:
+        return gst.state_code(self.gstin) if self.gstin else None
+
+
+class LineItem(BaseModel):
+    """One invoice line, exactly as printed."""
+
+    description: str
+    hsn_sac: str | None = Field(default=None, description="HSN (goods) or SAC (services) code")
+    qty: Decimal = Field(gt=0)
+    unit: str | None = None
+    unit_price: Money
+    taxable_value: Money
+    gst_rate: GstRate | None = Field(default=None, description="GST rate in percent; null if no GST")
+    cgst: Money = Decimal(0)
+    sgst: Money = Decimal(0)
+    igst: Money = Decimal(0)
+
+
+class RawInvoice(BaseModel):
+    """A vendor invoice with every number copied as printed. No arithmetic checks."""
+
+    kind: Literal["invoice"] = "invoice"
+    supplier: Party
+    buyer: Party
+    invoice_no: str
+    invoice_date: date
+    po_number: str | None = None
+    currency: Currency = "INR"
+    line_items: list[LineItem] = Field(min_length=1)
+    subtotal: Money
+    total_tax: Money
+    total: Money
+    confidence: float = Field(ge=0, le=1, description="Self-assessed extraction confidence")
+
+
+class Invoice(RawInvoice):
+    """A RawInvoice that also passes the arithmetic and GST-type rules."""
+
+    @model_validator(mode="after")
+    def _check_math_and_gst_type(self) -> Invoice:
+        issues = gst.arithmetic_issues(self) + gst.gst_type_issues(self)
+        if issues:
+            raise ValueError("; ".join(issues))
+        return self
+
+
+class ExtractionFailure(BaseModel):
+    """The document is not a valid invoice, or critical fields are unreadable."""
+
+    kind: Literal["failure"] = "failure"
+    reason: Literal["not_an_invoice", "unreadable", "missing_critical_fields"]
+    missing_fields: list[str] = []
+    detected_document_type: str | None = None
+
+
+ExtractionResult = Annotated[RawInvoice | ExtractionFailure, Field(discriminator="kind")]
+
+
+# --- Audit and decision -------------------------------------------------------------------------
+
+
+class Finding(BaseModel):
+    kind: FindingKind
+    severity: Severity
+    message: str
+    evidence: dict[str, str] = {}
+    source: Literal["deterministic", "llm"]
+
+
+class AuditReport(BaseModel):
+    findings: list[Finding]
+    narrative: str = Field(description="2-4 sentence plain-English explanation for the approver")
+    suggested_decision: Literal["approve", "needs_approval", "hold"]
+
+
+class Decision(BaseModel):
+    outcome: DecisionOutcome
+    reasons: list[str]
+
+
+class PostingReceipt(BaseModel):
+    posting_id: str
+    idempotency_key: str
+    posted_by: str
+    posted_at: str
+
+
+# --- Ledger rows (spec §5.1) --------------------------------------------------------------------
+
+
+class Vendor(BaseModel):
+    vendor_id: str
+    name: str
+    gstin: str | None
+    state_code: str
+    status: Literal["active", "blocked", "pending_kyc"]
+    bank_last4: str | None = None
+
+
+class POLine(BaseModel):
+    line_no: int
+    hsn_sac: str | None
+    description: str
+    qty: Decimal
+    unit_price: Decimal
+    gst_rate: Decimal
+
+
+class PurchaseOrder(BaseModel):
+    po_number: str
+    vendor_id: str
+    issued_on: date
+    status: Literal["open", "closed", "cancelled"]
+    lines: list[POLine] = []
+
+
+class PostedInvoice(BaseModel):
+    posting_id: str
+    vendor_id: str
+    invoice_no: str
+    fy: str
+    invoice_date: date
+    total: Decimal
+    currency: str
+    content_hash: str
+    posted_by: str
+    posted_at: str
+    idempotency_key: str
+
+
+# --- Ground truth (spec §5.3) -------------------------------------------------------------------
+
+
+class ExpectedFinding(BaseModel):
+    kind: FindingKind
+    severity: Severity
+
+
+class GroundTruth(BaseModel):
+    file_id: str
+    file_name: str
+    category: int
+    category_name: str
+    format: Literal["pdf", "png", "eml"]
+    expected: ExtractionResult
+    expected_findings: list[ExpectedFinding]
+    expected_decision: DecisionOutcome
+    notes: str = ""

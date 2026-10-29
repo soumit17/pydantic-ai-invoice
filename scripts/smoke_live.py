@@ -1,7 +1,7 @@
 """LIVE: one real model call, priced and logged to runs/costs.jsonl. Costs well under $0.001.
 
-    uv run python scripts/smoke_live.py
-    uv run python scripts/smoke_live.py --console   # also print OTel spans to the terminal
+uv run python scripts/smoke_live.py
+uv run python scripts/smoke_live.py --console   # also print OTel spans to the terminal
 """
 
 from __future__ import annotations

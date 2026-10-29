@@ -56,3 +56,45 @@ call the same `record_response()` from an `after_model_request` hook.
 Constructing an `'anthropic:'` agent fails if `ANTHROPIC_API_KEY` is unset (spec §2.1). Agents are
 built by `build_*_agent(settings)` functions instead of at module import, so importing never needs
 a key. The test `conftest.py` also sets a dummy key and turns off `ALLOW_MODEL_REQUESTS`.
+
+## D4. Two invoice models: lenient `RawInvoice`, strict `Invoice` (M1)
+
+If the extractor's output type validated arithmetic, a validation retry would push the model to
+"fix" a vendor's real mistake, and category-10 anomalies would vanish. So `RawInvoice` checks only
+the format (GSTIN pattern, money precision, at least one line). The arithmetic and GST-type rules
+live as plain functions in `gst.py`. Two things use those functions: `Invoice` (a strict subclass
+whose validator raises) and `checks.strict_validate` (which turns each failure into a finding).
+There is one source of truth, and two ways to apply it.
+
+## D5. Finding conventions (M1)
+
+- There is at most one finding per kind per invoice; the evidence lists every affected line. That
+  lets evals compare sets of `(kind, severity)`.
+- Severities: duplicates (exact and fuzzy), blocked vendors and GST-type mismatches are
+  **critical**, per §4.2. Everything else is a **warning**. A vendor with KYC pending reuses
+  `blocked_vendor` at warning severity. `info` findings never change the decision.
+- Price drift is **strictly greater than** 5%, and only upward; a lower price is not a problem
+  for AP. The borderline invoice (exactly +5.00%) therefore has no deterministic finding and
+  auto-approves. The auditor may still comment on it.
+- Foreign-currency invoices always get an `fx_unverified` warning, so they always go to a human.
+  Their INR value uses the static mock table `policy.FX_RATES_INR` (USD 84, EUR 91).
+- Fuzzy duplicate: same vendor, same date, same total, and the same invoice number after dropping
+  everything except letters and digits (`INV/26/042` ≈ `INV-26-042`).
+- PO lines are matched to invoice lines by HSN/SAC code, falling back to line position.
+
+## D6. Reproducible "today" (M1)
+
+The mock data is dated relative to 2026-10-29. `AS_OF_DATE` in `.env` pins "today" for the date
+checks and the evals; leave it unset to use the real date.
+
+## D7. Mock data choices (M1)
+
+- The Hindi/English vendor names are written in Latin script ("Shri Balaji Engineering Works",
+  "Maa Durga Packaging Udyog"). Without `uharfbuzz` (not on the §19.2 list), reportlab can't shape
+  Devanagari, so it would render wrongly. Real Devanagari is a possible stretch goal.
+- The PDFs use `Canvas(invariant=1)`, so regeneration is byte-identical for every file, not only
+  the ground truth. A test asserts this.
+- Expected findings and decisions are written by hand for each category in the generator, never
+  computed by the checks, so the M1 acceptance test really tests the checks.
+- `repos/app_store.py` (invoices, conversations, pending approvals) is deferred to M4, where the
+  approval flow decides its schema.
