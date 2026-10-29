@@ -3,37 +3,21 @@
 from __future__ import annotations
 
 import hashlib
-import subprocess
-import sys
 from collections import Counter
 from datetime import date
 from pathlib import Path
 
-import pytest
-
-from invoiceiq.config import PROJECT_ROOT
 from invoiceiq.models import GroundTruth, RawInvoice
 from invoiceiq.pipeline.checks import run_deterministic_checks
 from invoiceiq.policy import Policy, to_inr
 from invoiceiq.repos.ledger import LedgerRepo
+from tests.conftest import generate
 
 AS_OF = date(2026, 10, 29)
-GENERATOR = PROJECT_ROOT / "scripts" / "gen_mockdata.py"
-
-
-def generate(out: Path) -> None:
-    subprocess.run([sys.executable, str(GENERATOR), "--out", str(out)], check=True, capture_output=True)
 
 
 def digest(folder: Path) -> dict[str, str]:
     return {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in sorted(folder.iterdir())}
-
-
-@pytest.fixture(scope="module")
-def dataset(tmp_path_factory: pytest.TempPathFactory) -> Path:
-    out = tmp_path_factory.mktemp("mock")
-    generate(out)
-    return out
 
 
 def load_truth(dataset: Path) -> list[GroundTruth]:

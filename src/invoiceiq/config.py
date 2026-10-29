@@ -50,8 +50,23 @@ class Settings(BaseSettings):
         return self.runs_dir / "costs.jsonl"
 
     @property
-    def ledger_path(self) -> Path:
+    def ledger_seed_path(self) -> Path:
+        """The committed, read-only ledger written by the mock-data generator."""
         return self.data_dir / "ledger.sqlite"
+
+    @property
+    def runtime_dir(self) -> Path:
+        """Mutable state (git-ignored): the working ledger, app.sqlite, later dbos.sqlite."""
+        return self.data_dir / "runtime"
+
+    @property
+    def ledger_path(self) -> Path:
+        """The working ledger that postings write to, copied from the seed on first use."""
+        return self.runtime_dir / "ledger.sqlite"
+
+    @property
+    def app_db_path(self) -> Path:
+        return self.runtime_dir / "app.sqlite"
 
     def today(self) -> date:
         return self.as_of_date or date.today()

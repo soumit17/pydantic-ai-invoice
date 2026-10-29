@@ -117,7 +117,14 @@ class Finding(BaseModel):
 
 
 class AuditReport(BaseModel):
-    findings: list[Finding]
+    # checks_passed gives the model somewhere to put "I checked X, it's fine". Without it, the model
+    # filed passed checks as findings, some of them critical (first M3 run, D14).
+    checks_passed: list[str] = Field(
+        default=[], description="Checks you ran that found nothing wrong, one short line each"
+    )
+    findings: list[Finding] = Field(
+        description="Problems only, not already reported by the deterministic checks. Usually empty."
+    )
     narrative: str = Field(description="2-4 sentence plain-English explanation for the approver")
     suggested_decision: Literal["approve", "needs_approval", "hold"]
 
@@ -130,8 +137,26 @@ class Decision(BaseModel):
 class PostingReceipt(BaseModel):
     posting_id: str
     idempotency_key: str
+    amount: Decimal
     posted_by: str
     posted_at: str
+
+
+InvoiceStatus = Literal["rejected", "posted", "awaiting_approval", "held", "denied"]
+
+
+class InvoiceRecord(BaseModel):
+    """Everything the pipeline knows about one invoice: the graph's output and the stored record."""
+
+    invoice_id: str
+    file_name: str
+    status: InvoiceStatus
+    extraction: ExtractionResult | None = None
+    findings: list[Finding] = []
+    audit: AuditReport | None = None
+    decision: Decision | None = None
+    receipt: PostingReceipt | None = None
+    timings: dict[str, float] = {}
 
 
 # --- Ledger rows (spec §5.1) --------------------------------------------------------------------

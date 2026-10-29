@@ -5,14 +5,18 @@ Posting (with the idempotency key) arrives in M4.
 
 from __future__ import annotations
 
+import re
+import shutil
 import sqlite3
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
 import aiosqlite
 
+from invoiceiq import gst
+from invoiceiq.config import Settings
 from invoiceiq.gst import money
 from invoiceiq.models import POLine, PostedInvoice, PurchaseOrder, Vendor
 
@@ -158,3 +162,65 @@ class LedgerRepo:
             (vendor_id, since.isoformat()),
         )
         return [_posted(r) for r in rows]
+
+    async def search_posted(self, query: str, *, limit: int = 10) -> list[PostedInvoice]:
+        """Posted invoices whose number contains `query`, ignoring punctuation and case."""
+        needle = re.sub(r"[^A-Z0-9]", "", query.upper())
+        rows = await self._fetch("SELECT * FROM posted_invoices ORDER BY invoice_date DESC, posting_id")
+        hits = [r for r in rows if needle in re.sub(r"[^A-Z0-9]", "", str(r["invoice_no"]).upper())]
+        return [_posted(r) for r in hits[:limit]]
+
+    async def get_posting(self, idempotency_key: str) -> PostedInvoice | None:
+        rows = await self._fetch(
+            "SELECT * FROM posted_invoices WHERE idempotency_key = ?", (idempotency_key,)
+        )
+        return _posted(rows[0]) if rows else None
+
+    async def post_invoice(
+        self,
+        *,
+        vendor_id: str | None,
+        invoice_no: str,
+        invoice_date: date,
+        amount: Decimal,
+        currency: str,
+        content_hash: str,
+        posted_by: str,
+        idempotency_key: str,
+    ) -> tuple[PostedInvoice, bool]:
+        """Post once per idempotency key. Returns (posting, created); a repeat returns the first posting.
+
+        ON CONFLICT DO NOTHING makes the database the guard: whatever retries, restarts or double
+        clicks happen upstream, one key can only ever produce one row.
+        """
+        async with aiosqlite.connect(self.path) as db:
+            cur = await db.execute(
+                "INSERT INTO posted_invoices VALUES (?,?,?,?,?,?,?,?,?,?,?) "
+                "ON CONFLICT(idempotency_key) DO NOTHING",
+                (
+                    f"P-{idempotency_key}",
+                    vendor_id,
+                    invoice_no,
+                    gst.financial_year(invoice_date),
+                    invoice_date.isoformat(),
+                    str(amount),
+                    currency,
+                    content_hash,
+                    posted_by,
+                    datetime.now(UTC).isoformat(timespec="seconds"),
+                    idempotency_key,
+                ),
+            )
+            created = cur.rowcount == 1
+            await db.commit()
+        posting = await self.get_posting(idempotency_key)
+        assert posting is not None
+        return posting, created
+
+
+def open_ledger(settings: Settings) -> LedgerRepo:
+    """The working ledger in data/runtime/, copied from the committed seed on first use."""
+    if not settings.ledger_path.exists():
+        settings.runtime_dir.mkdir(parents=True, exist_ok=True)
+        shutil.copyfile(settings.ledger_seed_path, settings.ledger_path)
+    return LedgerRepo(settings.ledger_path)

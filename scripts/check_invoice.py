@@ -13,7 +13,7 @@ from invoiceiq.config import get_settings
 from invoiceiq.models import GroundTruth, RawInvoice
 from invoiceiq.pipeline.checks import run_deterministic_checks
 from invoiceiq.policy import Policy, to_inr
-from invoiceiq.repos.ledger import LedgerRepo
+from invoiceiq.repos.ledger import open_ledger
 
 
 async def check(gt: GroundTruth, *, verbose: bool) -> bool:
@@ -22,7 +22,7 @@ async def check(gt: GroundTruth, *, verbose: bool) -> bool:
     if isinstance(gt.expected, RawInvoice):
         inv = gt.expected
         findings = await run_deterministic_checks(
-            inv, ledger=LedgerRepo(settings.ledger_path), policy=policy, today=settings.today()
+            inv, ledger=open_ledger(settings), policy=policy, today=settings.today()
         )
         decision = policy.decide(findings, total_inr=to_inr(inv.total, inv.currency))
     else:

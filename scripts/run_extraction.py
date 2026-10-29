@@ -41,15 +41,15 @@ EXPERIMENT_IDS = [
 
 
 def retry_reasons(messages: list[ModelMessage]) -> list[str]:
-    """What the model was told before each retry. In V2 an output-tool retry is the tool's return
-    value carrying the error; other retries (e.g. a truncated reply) are RetryPromptParts."""
+    """What the model was told before each retry. In V2 a tool retry is the tool's return part with
+    outcome="retried"; other retries (e.g. a reply with no tool call) are RetryPromptParts."""
     reasons: list[str] = []
     for m in messages[1:]:
         if isinstance(m, ModelRequest):
             for part in m.parts:
                 if isinstance(part, RetryPromptPart):
                     reasons.append(part.model_response()[:300])
-                elif isinstance(part, ToolReturnPart) and part.content != "Final result processed.":
+                elif isinstance(part, ToolReturnPart) and part.outcome == "retried":
                     reasons.append(str(part.content)[:300])
     return reasons
 

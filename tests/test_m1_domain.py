@@ -161,6 +161,13 @@ def test_policy_critical_holds_even_with_warnings() -> None:
     assert decision.reasons[0].startswith("critical: exact_duplicate")
 
 
+def test_policy_llm_critical_is_capped_at_warning() -> None:
+    llm_critical = Finding(kind="gst_type_mismatch", severity="critical", message="m", source="llm")
+    decision = POLICY.decide([llm_critical], total_inr=Decimal(10))
+    assert decision.outcome == "awaiting_approval"  # a human looks; the LLM alone can't hold
+    assert "capped from critical" in decision.reasons[0]
+
+
 def test_policy_extraction_failure_rejects() -> None:
     failure = ExtractionFailure(reason="not_an_invoice", detected_document_type="quotation")
     assert POLICY.decide([], failure=failure).outcome == "rejected"

@@ -50,15 +50,21 @@ class Policy:
                 reasons.append("missing: " + ", ".join(failure.missing_fields))
             return Decision(outcome="rejected", reasons=reasons)
 
-        critical = [f for f in findings if f.severity == "critical"]
+        # Only deterministic rules can hold an invoice. An LLM finding marked critical is capped at
+        # warning: the model can send an invoice to a human, but never block a payment (D14).
+        critical = [f for f in findings if f.severity == "critical" and f.source == "deterministic"]
         if critical:
             return Decision(outcome="held", reasons=[f"critical: {f.kind}: {f.message}" for f in critical])
 
-        warnings = [f for f in findings if f.severity == "warning"]
+        warnings = [f for f in findings if f.severity == "warning" or f.severity == "critical"]
         if warnings:
             return Decision(
                 outcome="awaiting_approval",
-                reasons=[f"warning: {f.kind}: {f.message}" for f in warnings],
+                reasons=[
+                    f"warning{' (LLM, capped from critical)' if f.severity == 'critical' else ''}: "
+                    f"{f.kind}: {f.message}"
+                    for f in warnings
+                ],
             )
 
         if total_inr is None:
