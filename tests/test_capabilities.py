@@ -89,6 +89,7 @@ def test_logfire_scrubbing_masks_pii_inside_span_attributes() -> None:
         send_to_logfire=False,
         console=False,
         scrubbing=scrubbing_options(),
+        distributed_tracing=True,  # as in telemetry.py; this configure() is global for later tests
         additional_span_processors=[SimpleSpanProcessor(exporter)],
     )
     with logfire.span("model request", prompt=f"Bank: SBI, {ACCOUNT}", api_key="sk-secret"):

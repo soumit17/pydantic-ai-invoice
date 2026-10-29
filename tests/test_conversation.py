@@ -90,7 +90,7 @@ async def test_vendor_spend_sums_in_code(dataset: Path, tmp_path: Path) -> None:
     model = scripted_tool_then_answer(
         "vendor_spend", {"vendor_id": "V001", "start": "2026-01-01", "end": "2026-12-31"}
     )
-    agent = build_ask_ap(settings, model=model)
+    agent = build_ask_ap(settings, model=model, ledger="local")
     ledger = open_ledger(settings)
     reply = await chat(
         "spend?", conversation_id=None, user="a", agent=agent, store=store, ledger=ledger, today=AS_OF
@@ -117,7 +117,7 @@ async def test_explain_invoice_reads_the_stored_record(dataset: Path, tmp_path: 
     assert "blocked_vendor" in reply.reply and '"status":"held"' in reply.reply.replace(" ", "")
 
 
-async def test_ask_ap_reuses_the_ledger_capability(dataset: Path, tmp_path: Path) -> None:
+async def test_local_mode_reuses_the_ledger_capability(dataset: Path, tmp_path: Path) -> None:
     settings, store = await setup(dataset, tmp_path)
     seen: list[AgentInfo] = []
 
@@ -125,7 +125,7 @@ async def test_ask_ap_reuses_the_ledger_capability(dataset: Path, tmp_path: Path
         seen.append(info)
         return ModelResponse(parts=[TextPart("ok")])
 
-    agent = build_ask_ap(settings, model=FunctionModel(fn))
+    agent = build_ask_ap(settings, model=FunctionModel(fn), ledger="local")
     await chat(
         "hi",
         conversation_id=None,

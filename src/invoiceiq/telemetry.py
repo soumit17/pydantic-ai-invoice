@@ -30,6 +30,9 @@ def configure_telemetry(settings: Settings, *, console: bool = False) -> None:
         console=None if console else False,
         # Mask bank account and phone numbers inside span attributes (prompts, outputs, tool args).
         scrubbing=scrubbing_options(),
+        # Ask-AP's MCP client passes trace context to the ledger MCP server on purpose, so the
+        # server's tool spans nest under the agent run. Declare it, or Logfire warns (D18).
+        distributed_tracing=True,
     )
     # Emits agent-run / model-request / tool spans, and silences the first-run banner.
     # include_binary_content=False keeps base64 PDFs and scans out of the traces.

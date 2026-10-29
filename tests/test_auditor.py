@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from collections.abc import Callable
 from datetime import date
 from pathlib import Path
@@ -20,7 +21,7 @@ from pydantic_ai.models.function import AgentInfo, FunctionModel
 
 from invoiceiq.agents.auditor import AuditDeps, audit_prompt, build_auditor, merge_findings
 from invoiceiq.config import Settings
-from invoiceiq.models import Finding, GroundTruth, RawInvoice
+from invoiceiq.models import AuditFinding, AuditReport, Evidence, Finding, GroundTruth, RawInvoice
 from invoiceiq.policy import Policy
 from invoiceiq.repos.ledger import LedgerRepo
 
@@ -152,19 +153,39 @@ async def test_instructions_combine_agent_ledger_and_policy(settings: Settings, 
     assert "Auto-approve limit: ₹50000" in text and "older than 180 days" in text  # dynamic, from deps
 
 
-async def test_findings_from_the_model_are_marked_llm(settings: Settings, dataset: Path) -> None:
+async def test_the_model_cannot_choose_a_findings_source(settings: Settings, dataset: Path) -> None:
+    # AuditFinding has no `source`: whatever the model sends, merged findings are "llm".
     claimed = {"kind": "price_drift", "severity": "info", "message": "exactly 5%", "source": "deterministic"}
-    model, _ = scripted(report(claimed))
+    model, seen = scripted(report(claimed))
     result = await build_auditor(settings, model=model).run("x", deps=deps(dataset))
-    assert [f.source for f in result.output.findings] == ["llm"]
+    assert (
+        "source" not in seen[0].output_tools[0].parameters_json_schema["$defs"]["AuditFinding"]["properties"]
+    )
+    assert [f.source for f in merge_findings([], result.output.findings)] == ["llm"]
+
+
+def test_audit_report_schema_has_no_dict_fields() -> None:
+    # Anthropic's strict mode (used when thinking is on) can't express dict[str, str]: it forces
+    # {} (D20). Any dict in the auditor's output schema would silently lose data in escalated runs.
+    assert "additionalProperties" not in json.dumps(AuditReport.model_json_schema())
+
+
+def test_evidence_survives_as_name_value_pairs() -> None:
+    finding = AuditFinding(kind="price_drift", severity="info", message="m",
+                           evidence=[Evidence(name="drift_pct", value="5.00")])  # fmt: skip
+    assert finding.to_finding().evidence == {"drift_pct": "5.00"}
 
 
 def f(kind: str, source: str = "deterministic") -> Finding:
     return Finding(kind=kind, severity="warning", message="m", source=source)  # pyright: ignore[reportArgumentType]
 
 
+def af(kind: str) -> AuditFinding:
+    return AuditFinding(kind=kind, severity="warning", message="m")  # pyright: ignore[reportArgumentType]
+
+
 def test_merge_keeps_rules_authoritative() -> None:
-    merged = merge_findings([f("price_drift")], [f("price_drift", "llm"), f("stale_date", "llm")])
+    merged = merge_findings([f("price_drift")], [af("price_drift"), af("stale_date")])
     assert [(x.kind, x.source) for x in merged] == [("price_drift", "deterministic"), ("stale_date", "llm")]
 
 
@@ -191,3 +212,14 @@ async def test_vendor_history_validates_ids(settings: Settings, dataset: Path, b
     with capture_run_messages() as messages:
         await build_auditor(settings, model=model).run("x", deps=deps(dataset))
     assert tool_calls(messages).count("vendor_history") == 2  # retried once with a valid id
+
+
+def test_records_stored_before_the_change_still_load() -> None:
+    legacy = {
+        "kind": "price_drift",
+        "severity": "info",
+        "message": "m",
+        "evidence": {"drift_pct": "5.00"},
+        "source": "llm",
+    }
+    assert AuditFinding.model_validate(legacy).evidence == [Evidence(name="drift_pct", value="5.00")]

@@ -15,6 +15,21 @@ Haiku 5.5, thinking off, one run each on 2026-10-30 (`runs/extraction-*-20261030
 Before the fix (thinking on, max_tokens 2048 truncating): tool 10/10, 3 retries, $0.0131; native 10/10,
 2 retries, $0.0116; prompted 9/10 (inv-003 returned as a failure), 2 retries, $0.0111.
 
+## M6 experiment: prompt caching (`scripts/exp_caching.py`)
+
+| Agent | Invoices | Cache read / input tokens | Cache write tokens | Cost cached | Cost uncached | Saving |
+|---|---|---|---|---|---|---|
+| extractor | 10 | 19,971 / 47,466 (42%) | 2,219 | $0.0086 | $0.0103 | 17% |
+| auditor | 10 | 91,562 / 118,374 (77%) | 26,468 | $0.0079 | $0.0147 | 46% |
+
+## M6 experiment: Thinking escalation (`scripts/exp_thinking.py`)
+
+| Mode | Audits | False positives | Decisions right | Escalated | Reasoning tokens/audit | $/audit |
+|---|---|---|---|---|---|---|
+| off | 12 | 3 | 9/12 | 0 | 0 | $0.00056 |
+| escalation | 12 | 0 | 12/12 | 3 | 236 | $0.00083 |
+| always | 12 | 0 | 12/12 | 0 | 695 | $0.00097 |
+
 ## Questions
 
 1. When did validation-as-retry help, and when did it hide real problems? (§7.1)

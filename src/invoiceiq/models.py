@@ -12,9 +12,9 @@ from __future__ import annotations
 
 from datetime import date
 from decimal import Decimal
-from typing import Annotated, Literal
+from typing import Annotated, Literal, cast
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import BaseModel, Field, field_validator, model_validator
 
 from invoiceiq import gst
 
@@ -116,13 +116,48 @@ class Finding(BaseModel):
     source: Literal["deterministic", "llm"]
 
 
+class Evidence(BaseModel):
+    name: str
+    value: str
+
+
+class AuditFinding(BaseModel):
+    """A finding as the auditor model writes it, converted to a `Finding` by `merge_findings`.
+
+    Two differences from `Finding`, both on purpose (D20):
+    - no `source`: the schema itself stops the model from claiming a finding is "deterministic";
+    - evidence is a list of name/value pairs, not a dict. With thinking on, Pydantic AI uses
+      Anthropic's strict native output, where `dict[str, str]` can't be expressed and comes back {}.
+    """
+
+    kind: FindingKind
+    severity: Severity
+    message: str
+    evidence: list[Evidence] = []
+
+    @field_validator("evidence", mode="before")
+    @classmethod
+    def _accept_legacy_dict(cls, value: object) -> object:
+        # Records stored before D20 kept evidence as a dict; read them as name/value pairs.
+        if isinstance(value, dict):
+            legacy = cast(dict[object, object], value)
+            return [{"name": str(k), "value": str(v)} for k, v in legacy.items()]
+        return value
+
+    def to_finding(self) -> Finding:
+        evidence = {e.name: e.value for e in self.evidence}
+        return Finding(
+            kind=self.kind, severity=self.severity, message=self.message, evidence=evidence, source="llm"
+        )
+
+
 class AuditReport(BaseModel):
     # checks_passed gives the model somewhere to put "I checked X, it's fine". Without it, the model
     # filed passed checks as findings, some of them critical (first M3 run, D14).
     checks_passed: list[str] = Field(
         default=[], description="Checks you ran that found nothing wrong, one short line each"
     )
-    findings: list[Finding] = Field(
+    findings: list[AuditFinding] = Field(
         description="Problems only, not already reported by the deterministic checks. Usually empty."
     )
     narrative: str = Field(description="2-4 sentence plain-English explanation for the approver")
@@ -157,6 +192,7 @@ class InvoiceRecord(BaseModel):
     decision: Decision | None = None
     receipt: PostingReceipt | None = None
     timings: dict[str, float] = {}
+    audit_escalation: str | None = None  # why the auditor was re-run with Thinking (M6)
     error: str | None = None
 
 

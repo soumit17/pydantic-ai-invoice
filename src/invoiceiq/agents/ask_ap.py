@@ -12,10 +12,11 @@ from __future__ import annotations
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from typing import Literal
 
 from pydantic import BaseModel
 from pydantic_ai import Agent, ModelRetry, RunContext
-from pydantic_ai.capabilities import Caching, Thinking
+from pydantic_ai.capabilities import MCP, AbstractCapability, Caching, Thinking
 from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai.usage import UsageLimits
@@ -23,6 +24,7 @@ from pydantic_ai.usage import UsageLimits
 from invoiceiq.capabilities.cost import build_cost_hooks
 from invoiceiq.capabilities.ledger import ledger_capability
 from invoiceiq.config import Settings
+from invoiceiq.mcp_server import Spend, build_mcp_server
 from invoiceiq.models import InvoiceStatus, Vendor
 from invoiceiq.repos.app_store import AppStore
 from invoiceiq.repos.ledger import LedgerRepo
@@ -54,29 +56,42 @@ class InvoiceSummary(BaseModel):
     posting_id: str | None
 
 
-class Spend(BaseModel):
-    vendor_id: str
-    start: date
-    end: date
-    invoices: int
-    totals: dict[str, Decimal]  # per currency
-    posting_ids: list[str]
-
-
 INSTRUCTIONS = """\
 You are Ask AP, an assistant for an Indian accounts-payable team. Answer questions about
 invoices, vendors and payments, using the tools. Keep answers short and specific.
 
-- Never invent numbers. For a vendor's spend over a period, use vendor_spend; don't add up
-  postings yourself. A quarter is three calendar months (Q3 2026 = 1 Jul to 30 Sep 2026); "last
+- Never invent numbers. For a vendor's spend over a period, use the vendor spend tool; don't add
+  up postings yourself. A quarter is three calendar months (Q3 2026 = 1 Jul to 30 Sep 2026); "last
   quarter" is the one before today's.
-- To find a vendor from part of its name, use find_vendors.
+- To find a vendor from part of its name, use the find vendor tool first, to get its vendor id.
 - To explain why an invoice was flagged, held or posted, use explain_invoice.
 - If the tools can't answer, say so.
 """
 
 
-def build_ask_ap(settings: Settings, *, model: Model | str | None = None) -> AskAgent:
+LedgerAccess = Literal["mcp", "local"]
+
+
+def ledger_access(settings: Settings, mode: LedgerAccess) -> list[AbstractCapability[AskDeps]]:
+    """How Ask-AP reaches the ledger.
+
+    mcp:   the MCP capability, the spec's default. Over streamable HTTP when settings.mcp_url is set;
+           otherwise the same server connected in-process, which still speaks MCP, without a
+           second terminal. tool_prefix=True names the tools ledger_* so they can't collide with
+           local tools (the prefix comes from id="ledger").
+    local: the M3 ledger_capability object (AskDeps satisfies its HasLedger protocol), as an
+           offline fallback.
+    """
+    if mode == "local":
+        return [ledger_capability]
+    if settings.mcp_url:
+        return [MCP(url=settings.mcp_url, id="ledger", tool_prefix=True)]
+    return [MCP(local=build_mcp_server(settings), id="ledger", tool_prefix=True)]
+
+
+def build_ask_ap(
+    settings: Settings, *, model: Model | str | None = None, ledger: LedgerAccess = "mcp"
+) -> AskAgent:
     agent: AskAgent = Agent(
         model or settings.model_dev,
         deps_type=AskDeps,
@@ -89,7 +104,7 @@ def build_ask_ap(settings: Settings, *, model: Model | str | None = None) -> Ask
             Caching(),  # long conversations re-send their history every turn: cache it
             Thinking(effort=False),
             build_cost_hooks(settings),
-            ledger_capability,  # the same object the auditor uses (HasLedger protocol)
+            *ledger_access(settings, ledger),
         ],
     )
 
@@ -127,26 +142,28 @@ def build_ask_ap(settings: Settings, *, model: Model | str | None = None) -> Ask
         records = await ctx.deps.store.list_invoices(status, limit=min(max(limit, 1), 50))
         return [(r.invoice_id, r.status, r.file_name) for r in records]
 
-    @agent.tool
-    async def find_vendors(ctx: RunContext[AskDeps], name_contains: str) -> list[Vendor]:
-        """Vendors whose name contains the given text, e.g. 'balaji'."""
-        if len(name_contains.strip()) < 2:
-            raise ModelRetry("Search with at least 2 characters of the vendor's name.")
-        return await ctx.deps.ledger.search_vendors(name_contains)
+    if ledger == "local":
+        # In mcp mode these come from the server as ledger_find_vendor / ledger_vendor_spend.
+        @agent.tool
+        async def find_vendors(ctx: RunContext[AskDeps], name_contains: str) -> list[Vendor]:
+            """Vendors whose name contains the given text, e.g. 'balaji'."""
+            if len(name_contains.strip()) < 2:
+                raise ModelRetry("Search with at least 2 characters of the vendor's name.")
+            return await ctx.deps.ledger.search_vendors(name_contains)
 
-    @agent.tool
-    async def vendor_spend(ctx: RunContext[AskDeps], vendor_id: str, start: date, end: date) -> Spend:
-        """Total posted for a vendor between two invoice dates (inclusive), summed per currency."""
-        if end < start:
-            raise ModelRetry("end must be on or after start.")
-        postings = await ctx.deps.ledger.postings_between(vendor_id, start, end)
-        totals: dict[str, Decimal] = {}
-        for p in postings:
-            totals[p.currency] = totals.get(p.currency, Decimal(0)) + p.total
-        return Spend(
-            vendor_id=vendor_id, start=start, end=end, invoices=len(postings), totals=totals,
-            posting_ids=[p.posting_id for p in postings],
-        )  # fmt: skip
+        @agent.tool
+        async def vendor_spend(ctx: RunContext[AskDeps], vendor_id: str, start: date, end: date) -> Spend:
+            """Total posted for a vendor between two invoice dates (inclusive), summed per currency."""
+            if end < start:
+                raise ModelRetry("end must be on or after start.")
+            postings = await ctx.deps.ledger.postings_between(vendor_id, start, end)
+            totals: dict[str, Decimal] = {}
+            for p in postings:
+                totals[p.currency] = totals.get(p.currency, Decimal(0)) + p.total
+            return Spend(
+                vendor_id=vendor_id, start=start, end=end, invoices=len(postings), totals=totals,
+                posting_ids=[p.posting_id for p in postings],
+            )  # fmt: skip
 
     return agent
 

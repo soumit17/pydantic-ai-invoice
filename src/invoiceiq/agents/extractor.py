@@ -78,7 +78,11 @@ def _output_type(mode: OutputMode) -> OutputSpec[RawInvoice | ExtractionFailure]
 
 
 def build_extractor(
-    settings: Settings, *, model: Model | str | None = None, output_mode: OutputMode = "tool"
+    settings: Settings,
+    *,
+    model: Model | str | None = None,
+    output_mode: OutputMode = "tool",
+    caching: bool = True,
 ) -> ExtractorAgent:
     agent: ExtractorAgent = Agent(
         model or settings.model_dev,
@@ -94,7 +98,7 @@ def build_extractor(
         capabilities=[
             # Each extraction is one-shot, so only the stable prefix (instructions + tool schemas)
             # is worth caching; messages=False skips cache writes on the document itself.
-            Caching(messages=False),
+            *([Caching(messages=False)] if caching else []),  # caching=False: M6 experiment only
             # Haiku 5.5 thinks adaptively by default, and the reasoning shares max_tokens with the
             # answer: in the first live run it used ~1-1.4k tokens and truncated 14 answers at 2048.
             # Extraction is copying, not reasoning, so turn it off (the auditor gets it in M6).

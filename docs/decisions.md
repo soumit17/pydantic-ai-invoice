@@ -358,3 +358,88 @@ exactly +5.00%, as in M3). Both go to M6 as the test cases for "disagreement →
 `watch`, `pending`, `approve`, `deny`, `chat`, `postings`, `costs` and `reset`, all in-process
 through the same service functions as the API. `watch` exists because `curl` isn't installed on
 the dev machine; it also makes the growing JSON readable.
+
+## D18. The ledger as an MCP server, and Ask-AP as its client (M6)
+
+- **`FastMCP` is now `MCPServer`.** In mcp 2.x, `FastMCP` was renamed (`from mcp.server.mcpserver
+  import MCPServer`), and the old import path raises with a pointer to the migration guide. The
+  decorators (`@server.tool()`, `@server.resource(...)`) and `run(transport="stdio" |
+  "streamable-http")` are unchanged in spirit.
+- **The tools are `find_vendor`, `get_purchase_order`, `vendor_spend` and
+  `list_flagged_invoices`**, plus a `ledger://policy` resource rendered from the live `Policy`.
+  The spec's `vendor_spend(vendor_id, from, to)` uses `start`/`end`, because `from` is a Python
+  keyword. All of them are read-only.
+- **Ask-AP's default is `ledger="mcp"`:** `MCP(url=MCP_URL, id="ledger", tool_prefix=True)`, or
+  with no URL, `MCP(local=build_mcp_server(settings), ...)`. That is the same server connected
+  in-process: still the MCP protocol, without a second terminal. `tool_prefix=True` with
+  `id="ledger"` names the tools `ledger_*`, so they can't collide with Ask-AP's local
+  `explain_invoice` and `list_invoices`. `ledger="local"` keeps the M5 direct tools as an offline
+  fallback.
+- **All three transports were checked:** in-memory (tests), streamable HTTP
+  (`invoiceiq mcp --http`), and stdio (the server launched as a subprocess, as Claude Code does).
+- **Three ways to use an MCP server from Pydantic AI:**
+  - **`MCP(...)` capability** (used here): the recommended entry point. It runs the client
+    locally, so tool calls go through our hooks, cost ledger and tracing. It takes a URL, a
+    client or an in-process server, and handles prefixing and `allowed_tools` filtering.
+  - **`MCPToolset(...)` in `toolsets=[...]`:** the lower-level object the capability wraps. It's
+    useful for direct calls (`direct_call_tool`, `read_resource`), which is how the tests use it.
+  - **`MCP(url=..., native=True)`:** the *model provider* (Anthropic) connects to the server
+    itself. That needs a publicly reachable URL, and the calls bypass our process (no local hooks
+    or spans for them), so it's documented here rather than run against a localhost server.
+- **Distributed tracing is declared on purpose** (`distributed_tracing=True`). The in-process MCP
+  client propagates trace context so the server's spans nest under the agent run, and Logfire
+  warns unless that's declared intentional.
+
+## D19. Per-run Thinking escalation for the auditor (M6)
+
+The two remaining live misses (inv-014, inv-027) were both the auditor *disagreeing with a rule*:
+a non-info finding of a kind the deterministic checks had checked and found clean. Every finding
+kind has a rule, so that's easy to detect (`disagreements()`). `run_audit()` audits once with
+thinking off. If the result disagrees with the rules, or the extraction confidence is below 0.8
+(the spec's rule), it audits **once more** with `capabilities=[Thinking(effort="medium")]` for that
+run only, and `max_tokens=8192`, because thinking shares the budget (D11). The second, independent
+report replaces the first. Only invoices that would otherwise change outcome pay for reasoning.
+A per-run capability is merged over the agent's own `Thinking(effort=False)` and wins. The
+setting is `AUDIT_ESCALATION` (default on), and the record keeps `audit_escalation` (the reason).
+`scripts/exp_thinking.py` measures off vs escalation vs always-on on the hard cases.
+
+## D20. M6 experiment results, and two fixes they exposed
+
+**Caching** (10 invoices each, `runs/exp-caching-*`): the extractor saved **17%** (42% of input
+read from the cache; one-shot requests can only reuse the ~2.2k-token instructions+tools prefix).
+The auditor saved **46%** (77% read from the cache: every tool round re-sends the growing
+conversation, so `Caching()` with messages pays off). Cache writes (1.25×) were outweighed in both.
+
+**Thinking** (4 hard cases × 3 repeats, `runs/exp-thinking-*`): off made 3 false positives,
+9/12 decisions and $0.00056 per audit. **Escalation made 0 false positives, 12/12, $0.00083** (it
+thought on 3/12 audits, 236 reasoning tokens per audit on average). Always-on made 0, 12/12 and
+$0.00097 (695 reasoning tokens). Escalation matches always-on at about a third of the reasoning
+cost, so it stays on. Every escalation was inv-027: thinking turned "about 5.0%, flag it" into
+"exactly 5.00%, at the threshold, not flagged", which is the right call. inv-014 didn't
+false-alarm in any mode in this run (it's intermittent), so its escalation is proven only by a
+unit test so far. The full audit run with escalation: precision 16/17, decisions 38/39, 1
+escalation.
+
+**Fix 1: thinking silently dropped the auditor's evidence.** With thinking on, Pydantic AI
+switches Anthropic to strict native output (a tool call can't be forced while thinking), and
+strict mode can't express `dict[str, str]`, so it forces `{}`. Every thinking run's findings had
+`evidence={}`, and every non-thinking run's had data. The auditor now outputs
+`AuditFinding(kind, severity, message, evidence: list[Evidence(name, value)])`, with no `source`
+field (the schema, not a validator, stops the model from claiming "deterministic"), and
+`merge_findings` converts it to `Finding(source="llm")`. A test asserts the `AuditReport` schema
+has no `additionalProperties` (no dicts). Older stored records with dict evidence still load.
+
+**Fix 2: evaluations used the runtime ledger** (my regression from M4). After the pipeline had
+posted inv-034, re-auditing it found an exact duplicate (correct for the runtime, wrong for an
+eval). `audit_deps(seed=True)` now gives `run_audit.py`, the experiments and `check_invoice.py`
+the committed seed ledger.
+
+**Confirmation runs** (after both fixes): escalated inv-027 findings now keep their evidence
+(`invoice_unit_price`, `po_unit_price`, `drift_percent`). The full audit run reached **39/39
+decisions, precision 16/16, no false positives**, at $0.00077 per invoice. Escalation fired 3
+times: inv-027 (price_drift → info) and, for the first time live, two of the inv-014 kind, a
+`gst_type_mismatch` false alarm on correct inter-state IGST (inv-019, inv-029). Each was
+withdrawn after thinking. **MCP acceptance:** Ask-AP answered "what did we pay Shri Balaji
+Engineering last quarter?" with INR 36,981.17 over 2 invoices. That matches the ledger (P-00029 +
+P-00030, Aug 2026), reached through `ledger_find_vendor` → `ledger_vendor_spend` over streamable
+HTTP, with `MCP send tools/call` spans visible in the trace.

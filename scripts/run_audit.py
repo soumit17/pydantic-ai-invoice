@@ -21,7 +21,7 @@ from typing import Any
 from pydantic_ai.exceptions import UnexpectedModelBehavior, UsageLimitExceeded
 from pydantic_ai.messages import ModelMessage, ModelResponse, ToolCallPart
 
-from invoiceiq.agents.auditor import AUDIT_LIMITS, audit_deps, audit_prompt, build_auditor, merge_findings
+from invoiceiq.agents.auditor import audit_deps, build_auditor, merge_findings, run_audit
 from invoiceiq.capabilities.fx import FX_ID
 from invoiceiq.config import get_settings
 from invoiceiq.models import GroundTruth, RawInvoice
@@ -50,6 +50,7 @@ async def main() -> None:
     parser.add_argument("--limit", type=int)
     parser.add_argument("--ids", nargs="*")
     parser.add_argument("--final", action="store_true", help="use MODEL_FINAL (Sonnet) instead of Haiku")
+    parser.add_argument("--no-escalation", action="store_true", help="never re-run with Thinking (as in M3)")
     parser.add_argument("--console", action="store_true", help="print spans to the terminal")
     parser.add_argument("-v", "--verbose", action="store_true", help="narrative, tool trail and LLM findings")
     args = parser.parse_args()
@@ -70,7 +71,7 @@ async def main() -> None:
 
     model = settings.model_final if args.final else settings.model_dev
     agent = build_auditor(settings, model=model)
-    deps = audit_deps(settings)
+    deps = audit_deps(settings, seed=True)  # evaluate against the clean seed ledger
     print(f"auditing {len(truths)} invoice(s) with {model}; spent so far ${spent_before:.4f}\n")
 
     rows: list[dict[str, Any]] = []
@@ -82,9 +83,7 @@ async def main() -> None:
         )
         start = time.perf_counter()
         try:
-            result = await agent.run(
-                audit_prompt(inv, rule_findings, deps.policy), deps=deps, usage_limits=AUDIT_LIMITS
-            )
+            outcome = await run_audit(agent, inv, rule_findings, deps, escalate=not args.no_escalation)
         except (UnexpectedModelBehavior, UsageLimitExceeded) as e:
             print(f"ERR  {t.file_id} {t.category_name:<24} {type(e).__name__}: {e}")
             rows.append(
@@ -92,7 +91,7 @@ async def main() -> None:
             )
             continue
         seconds = time.perf_counter() - start
-        report = result.output
+        report, result = outcome.report, outcome.run
         merged = merge_findings(rule_findings, report.findings)
         decision = deps.policy.decide(merged, total_inr=to_inr(inv.total, inv.currency))
 
@@ -103,7 +102,8 @@ async def main() -> None:
         ok = flagged == expected and decision.outcome == t.expected_decision
         print(
             f"{'OK ' if ok else 'BAD'}  {t.file_id} {t.category_name:<24} {decision.outcome:<18} "
-            f"llm+{len(report.findings)}  tools {len(trail)}{'  FX' if fx_loaded else ''}  "
+            f"llm+{len(report.findings)}  tools {len(trail)}{'  FX' if fx_loaded else ''}"
+            f"{'  ESC' if outcome.escalation else ''}  "
             f"req {result.usage.requests} in {result.usage.input_tokens:>6} "
             f"out {result.usage.output_tokens:>5}  "
             f"{seconds:4.1f}s"
@@ -114,6 +114,10 @@ async def main() -> None:
                 f"got {sorted(flagged) or '-'}"
             )
         if args.verbose:
+            if outcome.escalation and outcome.first_report:
+                print(f"       escalated ({outcome.escalation}); the first, unthinking report said:")
+                for f in outcome.first_report.findings:
+                    print(f"         - {f.severity} {f.kind}: {f.message}")
             print(f"       tools: {' → '.join(trail) or '(none)'}")
             for c in report.checks_passed:
                 print(f"       ✓ {c}")
@@ -125,7 +129,7 @@ async def main() -> None:
             "file_id": t.file_id, "category": t.category_name, "currency": inv.currency,
             "expected": sorted(expected), "flagged": sorted(flagged),
             "llm_findings": [f.model_dump(mode="json") for f in report.findings],
-            "checks_passed": report.checks_passed,
+            "checks_passed": report.checks_passed, "escalation": outcome.escalation,
             "decision": decision.outcome, "expected_decision": t.expected_decision,
             "suggested": report.suggested_decision, "narrative": report.narrative,
             "trajectory": trail, "fx_loaded": fx_loaded, "requests": result.usage.requests,

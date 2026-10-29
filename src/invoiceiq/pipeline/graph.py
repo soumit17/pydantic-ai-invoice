@@ -35,14 +35,7 @@ from pydantic_ai.messages import (
 from pydantic_core import from_json
 from pydantic_graph import EndMarker, GraphBuilder, StepContext, reduce_list_extend
 
-from invoiceiq.agents.auditor import (
-    AUDIT_LIMITS,
-    AuditDeps,
-    AuditorAgent,
-    audit_prompt,
-    build_auditor,
-    merge_findings,
-)
+from invoiceiq.agents.auditor import AuditDeps, AuditorAgent, build_auditor, merge_findings, run_audit
 from invoiceiq.agents.extractor import EXTRACT_LIMITS, ExtractDeps, ExtractorAgent, build_extractor
 from invoiceiq.agents.poster import PosterAgent, PostingContext, build_poster
 from invoiceiq.approvals import POLICY_USER, request_posting, resolve
@@ -85,6 +78,7 @@ class PipelineState:
     audit: AuditReport | None = None
     decision: Decision | None = None
     timings: dict[str, float] = field(default_factory=lambda: {})
+    audit_escalation: str | None = None
 
 
 @dataclass
@@ -141,6 +135,7 @@ def _record(ctx: Ctx[PipelineState, PipelineDeps, object], **fields: object) -> 
             "audit": s.audit,
             "decision": s.decision,
             "timings": s.timings,
+            "audit_escalation": s.audit_escalation,
             **fields,
         }
     )
@@ -228,13 +223,14 @@ async def audit(ctx: Ctx[PipelineState, PipelineDeps, list[Finding]]) -> AuditRe
     rule_findings = ctx.state.findings + sorted(ctx.inputs, key=lambda f: KIND_ORDER.index(f.kind))
     deps = AuditDeps(ledger=ctx.deps.ledger, policy=ctx.deps.policy, today=ctx.deps.settings.today())
     start = time.perf_counter()
-    result = await ctx.deps.auditor.run(
-        audit_prompt(ctx.state.raw, rule_findings, ctx.deps.policy), deps=deps, usage_limits=AUDIT_LIMITS
+    outcome = await run_audit(
+        ctx.deps.auditor, ctx.state.raw, rule_findings, deps, escalate=ctx.deps.settings.audit_escalation
     )
     ctx.state.timings["audit"] = round(time.perf_counter() - start, 3)
-    ctx.state.findings = merge_findings(rule_findings, result.output.findings)
-    ctx.state.audit = result.output
-    return result.output
+    ctx.state.findings = merge_findings(rule_findings, outcome.report.findings)
+    ctx.state.audit = outcome.report
+    ctx.state.audit_escalation = outcome.escalation
+    return outcome.report
 
 
 @g.step

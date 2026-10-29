@@ -42,6 +42,11 @@ class Settings(BaseSettings):
 
     logfire_token: SecretStr | None = None
 
+    # Ask-AP reaches the ledger over MCP: this URL (streamable HTTP), or in-process when unset.
+    mcp_url: str | None = None
+    # Re-run the auditor once with Thinking() when it disagrees with the rules (M6, D19).
+    audit_escalation: bool = True
+
     data_dir: Path = PROJECT_ROOT / "data"
     runs_dir: Path = PROJECT_ROOT / "runs"
 

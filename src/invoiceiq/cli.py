@@ -1,13 +1,12 @@
 """The `invoiceiq` command line (spec §13). Runs in-process, through the same services as the API.
 
-invoiceiq serve                                  # the HTTP API on :8000
-invoiceiq ingest data/invoices/inv-017.pdf       # LIVE: one file through the pipeline
-invoiceiq run --fresh                            # LIVE: all 40, compared with ground truth
-invoiceiq pending                                # $0: the approver inbox
-invoiceiq approve inv-017 --user alice [--note ...] [--amount ...]
-invoiceiq deny inv-029 --user alice --note "unknown supplier"
-invoiceiq chat --user alice                      # LIVE: Ask-AP, with memory
-invoiceiq postings | costs | reset               # $0
+Commands (LIVE = calls the model and costs money; the rest are $0):
+- serve: the HTTP API on :8000. watch ID: follow its SSE stream for one invoice.
+- ingest FILE..., run [--fresh]: LIVE, the pipeline on files, or on all 40 against ground truth.
+- pending, approve ID --user U [--note N] [--amount A], deny ID --user U --note N: approvals.
+- chat --user U [--mcp-url URL | --local]: LIVE, Ask-AP with memory; the ledger over MCP.
+- mcp [--http HOST:PORT]: the ledger MCP server, over stdio (Claude Code) or streamable HTTP.
+- postings, costs, reset: housekeeping.
 """
 
 from __future__ import annotations
@@ -80,6 +79,26 @@ def serve(host: str = "127.0.0.1", port: int = 8000) -> None:
     import uvicorn
 
     uvicorn.run("invoiceiq.api:app", host=host, port=port)
+
+
+@app.command()
+def mcp(
+    http: Annotated[
+        str | None,
+        typer.Option(help="Serve streamable HTTP on HOST:PORT (e.g. 127.0.0.1:8765) instead of stdio."),
+    ] = None,
+) -> None:
+    """Run the ledger MCP server: stdio for Claude Code, or streamable HTTP at http://HOST:PORT/mcp."""
+    from invoiceiq.mcp_server import build_mcp_server
+
+    settings = get_settings()
+    server = build_mcp_server(settings)
+    if http is None:
+        server.run(transport="stdio")  # stdout is the protocol channel: print nothing else
+        return
+    host, _, port = http.rpartition(":")
+    typer.echo(f"ledger MCP server on http://{host or '127.0.0.1'}:{port}/mcp", err=True)
+    server.run(transport="streamable-http", host=host or "127.0.0.1", port=int(port))
 
 
 # --- pipeline -----------------------------------------------------------------------------------
@@ -288,18 +307,25 @@ def deny(
 def chat_cmd(
     user: User = "anonymous",
     conversation: Annotated[str | None, typer.Option(help="Continue a stored conversation by id.")] = None,
+    mcp_url: Annotated[
+        str | None,
+        typer.Option(help="A running MCP server, e.g. http://127.0.0.1:8765/mcp (default: in-process)."),
+    ] = None,
+    local: Annotated[bool, typer.Option("--local", help="Direct ledger tools instead of MCP.")] = False,
     console: Console = False,
 ) -> None:
     """LIVE: talk to Ask-AP. The conversation is stored after every turn; resume it with --conversation."""
 
     async def go() -> None:
         settings = _setup(console)
+        if mcp_url:
+            settings = settings.model_copy(update={"mcp_url": mcp_url})
         deps = await pipeline_deps(settings)
-        agent = build_ask_ap(settings)
+        agent = build_ask_ap(settings, ledger="local" if local else "mcp")
+        mode = "direct tools" if local else f"MCP ({settings.mcp_url or 'in-process server'})"
         conversation_id = conversation
-        typer.echo(
-            "Ask AP. Empty line to quit." + (f" Continuing {conversation_id}." if conversation_id else "")
-        )
+        resuming = f" Continuing {conversation_id}." if conversation_id else ""
+        typer.echo(f"Ask AP, ledger via {mode}. Empty line to quit.{resuming}")
         while True:
             message = typer.prompt("you", default="", show_default=False).strip()
             if not message:

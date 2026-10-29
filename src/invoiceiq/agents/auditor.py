@@ -16,16 +16,17 @@ from dataclasses import dataclass
 from datetime import date
 
 from pydantic_ai import Agent, RunContext
+from pydantic_ai.agent import AgentRunResult
 from pydantic_ai.capabilities import Caching, Thinking
 from pydantic_ai.models import Model
-from pydantic_ai.settings import ModelSettings
+from pydantic_ai.settings import ModelSettings, ThinkingLevel
 from pydantic_ai.usage import UsageLimits
 
 from invoiceiq.capabilities.cost import build_cost_hooks
 from invoiceiq.capabilities.fx import fx_capability
 from invoiceiq.capabilities.ledger import ledger_capability
 from invoiceiq.config import Settings
-from invoiceiq.models import AuditReport, Finding, RawInvoice
+from invoiceiq.models import AuditFinding, AuditReport, Finding, RawInvoice
 from invoiceiq.policy import Policy
 from invoiceiq.repos.ledger import LedgerRepo, open_ledger
 
@@ -74,7 +75,9 @@ not argue with them.
 """
 
 
-def build_auditor(settings: Settings, *, model: Model | str | None = None) -> AuditorAgent:
+def build_auditor(
+    settings: Settings, *, model: Model | str | None = None, caching: bool = True
+) -> AuditorAgent:
     agent: AuditorAgent = Agent(
         model or settings.model_dev,
         deps_type=AuditDeps,
@@ -86,7 +89,8 @@ def build_auditor(settings: Settings, *, model: Model | str | None = None) -> Au
         retries=2,
         capabilities=[
             # Multi-step runs (tool calls) re-send a growing conversation, so cache messages too.
-            Caching(),
+            # caching=False exists only for the M6 caching experiment.
+            *([Caching()] if caching else []),
             # Off by default, as in the extractor. M6 adds Thinking() per run for hard cases only,
             # which is the point of the escalation experiment.
             Thinking(effort=False),
@@ -104,14 +108,6 @@ def build_auditor(settings: Settings, *, model: Model | str | None = None) -> Au
             f"Price drift is flagged above {p.price_drift_pct}% over the PO price. "
             f"Invoices older than {p.stale_after_days} days are stale."
         )
-
-    @agent.output_validator
-    def mark_as_llm(ctx: RunContext[AuditDeps], report: AuditReport) -> AuditReport:
-        # Deterministic post-processing, not a retry: whatever the model wrote, its findings are
-        # LLM-sourced. Trust in a finding depends on where it came from, so the model doesn't get
-        # to claim "deterministic".
-        findings = [f.model_copy(update={"source": "llm"}) for f in report.findings]
-        return report.model_copy(update={"findings": findings})
 
     return agent
 
@@ -138,14 +134,79 @@ def audit_prompt(invoice: RawInvoice, findings: Sequence[Finding], policy: Polic
     )
 
 
-def merge_findings(deterministic: Sequence[Finding], llm: Sequence[Finding]) -> list[Finding]:
+def merge_findings(deterministic: Sequence[Finding], llm: Sequence[AuditFinding]) -> list[Finding]:
     """Deterministic findings first. An LLM finding of a kind the rules already reported is dropped:
-    the rules are authoritative for their kinds."""
+    the rules are authoritative for their kinds. The rest become `Finding(source="llm")`."""
     seen = {f.kind for f in deterministic}
-    return [*deterministic, *(f for f in llm if f.kind not in seen)]
+    return [*deterministic, *(f.to_finding() for f in llm if f.kind not in seen)]
 
 
-def audit_deps(settings: Settings) -> AuditDeps:
-    return AuditDeps(
-        ledger=open_ledger(settings), policy=Policy.from_settings(settings), today=settings.today()
+def audit_deps(settings: Settings, *, seed: bool = False) -> AuditDeps:
+    """seed=True: the committed, read-only seed ledger, for evaluations against ground truth (the
+    runtime ledger holds the pipeline's own postings, which make re-audited invoices duplicates)."""
+    ledger = LedgerRepo(settings.ledger_seed_path) if seed else open_ledger(settings)
+    return AuditDeps(ledger=ledger, policy=Policy.from_settings(settings), today=settings.today())
+
+
+# --- Thinking escalation (M6) ---------------------------------------------------------------------
+
+LOW_CONFIDENCE = 0.8
+# Haiku 5.5 thinking shares max_tokens with the answer (D11), so the escalated run needs room.
+ESCALATION_MAX_TOKENS = 8192
+
+
+def disagreements(report: AuditReport, rule_findings: Sequence[Finding]) -> list[AuditFinding]:
+    """LLM findings that would change the outcome on a kind the rules checked and found clean.
+
+    Every finding kind has a deterministic rule, so a non-info LLM finding of a kind the rules
+    didn't report is the auditor contradicting a rule. (One the rules *did* report is merged away.)
+    """
+    rule_kinds = {f.kind for f in rule_findings}
+    return [f for f in report.findings if f.severity != "info" and f.kind not in rule_kinds]
+
+
+def escalation_reason(report: AuditReport, rule_findings: Sequence[Finding], confidence: float) -> str | None:
+    """Spec §7.2: think harder when the checks disagree, or the extraction is unsure."""
+    if found := disagreements(report, rule_findings):
+        return "auditor disagrees with the rules: " + ", ".join(f"{f.severity} {f.kind}" for f in found)
+    if confidence < LOW_CONFIDENCE:
+        return f"extraction confidence {confidence:.2f} < {LOW_CONFIDENCE}"
+    return None
+
+
+@dataclass
+class AuditOutcome:
+    report: AuditReport
+    escalation: str | None  # why the thinking re-run happened, or None
+    first_report: AuditReport | None  # the report the escalation replaced
+    run: AgentRunResult[AuditReport]  # the final run: its messages show the tool trail
+
+
+async def run_audit(
+    agent: AuditorAgent,
+    invoice: RawInvoice,
+    rule_findings: Sequence[Finding],
+    deps: AuditDeps,
+    *,
+    escalate: bool,
+    thinking: ThinkingLevel = "medium",
+) -> AuditOutcome:
+    """Audit once without thinking; if the result disagrees with the rules, audit again *with* it.
+
+    Thinking is added for that one run with `capabilities=[Thinking(...)]`, a per-run capability
+    merged over the agent's own `Thinking(effort=False)`. Only the invoices that would otherwise
+    change outcome pay for reasoning tokens.
+    """
+    prompt = audit_prompt(invoice, rule_findings, deps.policy)
+    first = await agent.run(prompt, deps=deps, usage_limits=AUDIT_LIMITS)
+    reason = escalation_reason(first.output, rule_findings, invoice.confidence) if escalate else None
+    if reason is None:
+        return AuditOutcome(first.output, None, None, first)
+    second = await agent.run(
+        prompt,
+        deps=deps,
+        usage_limits=AUDIT_LIMITS,
+        capabilities=[Thinking(effort=thinking)],
+        model_settings=ModelSettings(max_tokens=ESCALATION_MAX_TOKENS),
     )
+    return AuditOutcome(second.output, reason, first.output, second)
