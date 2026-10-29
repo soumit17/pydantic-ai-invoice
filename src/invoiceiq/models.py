@@ -142,7 +142,7 @@ class PostingReceipt(BaseModel):
     posted_at: str
 
 
-InvoiceStatus = Literal["rejected", "posted", "awaiting_approval", "held", "denied"]
+InvoiceStatus = Literal["processing", "failed", "rejected", "posted", "awaiting_approval", "held", "denied"]
 
 
 class InvoiceRecord(BaseModel):
@@ -157,6 +157,7 @@ class InvoiceRecord(BaseModel):
     decision: Decision | None = None
     receipt: PostingReceipt | None = None
     timings: dict[str, float] = {}
+    error: str | None = None
 
 
 # --- Ledger rows (spec §5.1) --------------------------------------------------------------------

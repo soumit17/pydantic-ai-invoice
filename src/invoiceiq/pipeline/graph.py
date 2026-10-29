@@ -18,11 +18,22 @@ Regenerate docs/pipeline.md with `uv run python -m invoiceiq.pipeline.graph`.
 from __future__ import annotations
 
 import time
+from collections.abc import AsyncIterable
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from pydantic_ai.messages import UserContent
-from pydantic_graph import GraphBuilder, StepContext, reduce_list_extend
+from pydantic_ai import RunContext
+from pydantic_ai.agent import EventStreamHandler
+from pydantic_ai.messages import (
+    AgentStreamEvent,
+    PartDeltaEvent,
+    PartStartEvent,
+    ToolCallPart,
+    ToolCallPartDelta,
+    UserContent,
+)
+from pydantic_core import from_json
+from pydantic_graph import EndMarker, GraphBuilder, StepContext, reduce_list_extend
 
 from invoiceiq.agents.auditor import (
     AUDIT_LIMITS,
@@ -47,6 +58,7 @@ from invoiceiq.models import (
 )
 from invoiceiq.pipeline import checks
 from invoiceiq.pipeline.documents import load_document as read_document
+from invoiceiq.pipeline.events import EventBus
 from invoiceiq.policy import Policy, to_inr
 from invoiceiq.repos.app_store import AppStore
 from invoiceiq.repos.ledger import LedgerRepo, open_ledger
@@ -86,6 +98,7 @@ class PipelineDeps:
     extractor: ExtractorAgent
     auditor: AuditorAgent
     poster: PosterAgent
+    events: EventBus | None = None  # set by the API so /invoices/{id}/stream can follow the run
 
 
 async def pipeline_deps(
@@ -148,7 +161,13 @@ async def extract(ctx: Ctx[PipelineState, PipelineDeps, list[UserContent]]) -> R
     # LLM step 1. The union return type is what the decision below routes on.
     start = time.perf_counter()
     deps = ExtractDeps(company_gstin=ctx.deps.settings.company_gstin, today=ctx.deps.settings.today())
-    result = await ctx.deps.extractor.run(ctx.inputs, deps=deps, usage_limits=EXTRACT_LIMITS)
+    events = ctx.deps.events
+    # run() with an event_stream_handler, not run_stream(): run_stream() can't retry a failed
+    # output validation, and the extractor relies on those retries (D17).
+    handler = partial_json_publisher(events, ctx.state.invoice_id) if events else None
+    result = await ctx.deps.extractor.run(
+        ctx.inputs, deps=deps, usage_limits=EXTRACT_LIMITS, event_stream_handler=handler
+    )
     ctx.state.timings["extract"] = round(time.perf_counter() - start, 3)
     return result.output
 
@@ -311,7 +330,55 @@ graph = g.build()
 
 
 async def run_pipeline(source: InvoiceSource, deps: PipelineDeps) -> InvoiceRecord:
-    return await graph.run(state=PipelineState(), deps=deps, inputs=source)
+    """Run the graph. With deps.events set, publish each step as it is scheduled."""
+    if deps.events is None:
+        return await graph.run(state=PipelineState(), deps=deps, inputs=source)
+    events = deps.events
+    # graph.iter() hands us each batch of tasks before they run: a step-by-step view of the graph
+    # without touching the steps themselves.
+    async with graph.iter(state=PipelineState(), deps=deps, inputs=source) as run:
+        async for item in run:
+            if isinstance(item, EndMarker):
+                break
+            for task in item:
+                events.publish(source.invoice_id, {"type": "step", "node": str(task.node_id)})
+    assert run.output is not None
+    return run.output
+
+
+def partial_json_publisher(events: EventBus, invoice_id: str) -> EventStreamHandler[ExtractDeps]:
+    """Publish the extractor's output tool arguments as they stream: partial JSON, growing.
+
+    These are unvalidated snapshots. stream_output() would validate each one, but a RawInvoice only
+    validates once its last required fields (subtotal, total, confidence) arrive, which is the end
+    of the stream. A retry starts a new attempt, and the snapshots start over.
+    """
+    MIN_GROWTH = 120  # characters between snapshots; Claude streams a few characters per delta
+
+    async def handler(ctx: RunContext[ExtractDeps], stream: AsyncIterable[AgentStreamEvent]) -> None:
+        attempt = ctx.run_step
+        buffer, published = "", 0
+        async for event in stream:
+            if isinstance(event, PartStartEvent) and isinstance(event.part, ToolCallPart):
+                buffer = event.part.args if isinstance(event.part.args, str) else ""
+                published = 0
+            elif (
+                isinstance(event, PartDeltaEvent)
+                and isinstance(event.delta, ToolCallPartDelta)
+                and isinstance(event.delta.args_delta, str)
+            ):
+                buffer += event.delta.args_delta
+                if len(buffer) - published >= MIN_GROWTH:
+                    published = len(buffer)
+                    snapshot = from_json(buffer, allow_partial=True)
+                    events.publish(invoice_id, {"type": "partial", "attempt": attempt, "invoice": snapshot})
+        if buffer and len(buffer) > published:
+            events.publish(
+                invoice_id,
+                {"type": "partial", "attempt": attempt, "invoice": from_json(buffer, allow_partial=True)},
+            )
+
+    return handler
 
 
 def render_doc() -> str:

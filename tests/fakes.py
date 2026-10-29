@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import json
 import shutil
+from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -17,9 +18,10 @@ from pydantic_ai.messages import (
     ToolReturnPart,
     UserPromptPart,
 )
-from pydantic_ai.models.function import AgentInfo, FunctionModel
+from pydantic_ai.models.function import AgentInfo, DeltaToolCall, DeltaToolCalls, FunctionModel
 from pydantic_ai.usage import RequestUsage
 
+from invoiceiq.agents.ask_ap import AskAgent, build_ask_ap
 from invoiceiq.agents.auditor import AuditorAgent, build_auditor
 from invoiceiq.agents.extractor import FAILURE_TOOL, INVOICE_TOOL, ExtractorAgent, build_extractor
 from invoiceiq.agents.poster import RECEIPT_TOOL, PosterAgent, build_poster
@@ -53,7 +55,14 @@ def fake_extractor(settings: Settings, expected: RawInvoice | ExtractionFailure)
             parts=[ToolCallPart(tool, args)], usage=RequestUsage(input_tokens=4500, output_tokens=900)
         )
 
-    return build_extractor(settings, model=FunctionModel(fn))
+    async def stream_fn(messages: list[ModelMessage], info: AgentInfo) -> AsyncIterator[DeltaToolCalls]:
+        # Used when the run streams (an event_stream_handler is attached): the same answer, in chunks.
+        tool = INVOICE_TOOL if isinstance(expected, RawInvoice) else FAILURE_TOOL
+        payload = expected.model_dump_json(exclude={"kind"})
+        for i in range(0, len(payload), 150):
+            yield {0: DeltaToolCall(name=tool if i == 0 else None, json_args=payload[i : i + 150])}
+
+    return build_extractor(settings, model=FunctionModel(fn, stream_function=stream_fn))
 
 
 def fake_auditor(settings: Settings) -> AuditorAgent:
@@ -97,3 +106,19 @@ def fake_poster(settings: Settings, calls: PosterCalls | None = None) -> PosterA
         return ModelResponse(parts=[TextPart(f"Not posted: {ret.content}")])
 
     return build_poster(settings, model=FunctionModel(fn))
+
+
+def fake_ask_ap(settings: Settings) -> AskAgent:
+    """Replies with every user message it can see in the conversation, proving memory."""
+
+    def fn(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        asked = [
+            str(p.content)
+            for m in messages
+            if isinstance(m, ModelRequest)
+            for p in m.parts
+            if isinstance(p, UserPromptPart)
+        ]
+        return ModelResponse(parts=[TextPart(" | ".join(asked))])
+
+    return build_ask_ap(settings, model=FunctionModel(fn))

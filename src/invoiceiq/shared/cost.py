@@ -71,3 +71,31 @@ def check_budget(*, path: Path, cap_usd: float, project: str = PROJECT) -> Decim
     if spent >= Decimal(str(cap_usd)):
         raise BudgetExceeded(f"{project} has spent ${spent:.4f}, cap is ${cap_usd:.2f}")
     return spent
+
+
+def summary(*, path: Path, cap_usd: float, project: str = PROJECT) -> dict[str, Any]:
+    """Spend so far, split by label (agent or script) and by model."""
+    by_label: dict[str, Decimal] = {}
+    by_model: dict[str, Decimal] = {}
+    requests = 0
+    if path.exists():
+        with path.open(encoding="utf-8") as f:
+            for line in f:
+                if not line.strip():
+                    continue
+                row: dict[str, Any] = json.loads(line)
+                if row.get("project") != project:
+                    continue
+                usd = Decimal(str(row["usd"]))
+                requests += 1
+                by_label[row.get("label") or "-"] = by_label.get(row.get("label") or "-", Decimal(0)) + usd
+                by_model[row.get("model") or "-"] = by_model.get(row.get("model") or "-", Decimal(0)) + usd
+    total = sum(by_label.values(), Decimal(0))
+    return {
+        "total_usd": str(total),
+        "cap_usd": str(cap_usd),
+        "remaining_usd": str(Decimal(str(cap_usd)) - total),
+        "requests": requests,
+        "by_label": {k: str(v) for k, v in sorted(by_label.items())},
+        "by_model": {k: str(v) for k, v in sorted(by_model.items())},
+    }

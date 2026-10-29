@@ -170,6 +170,23 @@ class LedgerRepo:
         hits = [r for r in rows if needle in re.sub(r"[^A-Z0-9]", "", str(r["invoice_no"]).upper())]
         return [_posted(r) for r in hits[:limit]]
 
+    async def search_vendors(self, query: str, *, limit: int = 10) -> list[Vendor]:
+        """Vendors whose name contains `query` (case-insensitive)."""
+        rows = await self._fetch(
+            "SELECT * FROM vendors WHERE lower(name) LIKE ? ORDER BY name LIMIT ?",
+            (f"%{query.strip().lower()}%", limit),
+        )
+        return [_vendor(r) for r in rows]
+
+    async def postings_between(self, vendor_id: str, start: date, end: date) -> list[PostedInvoice]:
+        """Postings for a vendor with an invoice date in [start, end], oldest first."""
+        rows = await self._fetch(
+            "SELECT * FROM posted_invoices WHERE vendor_id = ? AND invoice_date BETWEEN ? AND ? "
+            "ORDER BY invoice_date, posting_id",
+            (vendor_id, start.isoformat(), end.isoformat()),
+        )
+        return [_posted(r) for r in rows]
+
     async def get_posting(self, idempotency_key: str) -> PostedInvoice | None:
         rows = await self._fetch(
             "SELECT * FROM posted_invoices WHERE idempotency_key = ?", (idempotency_key,)

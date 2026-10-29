@@ -308,3 +308,53 @@ disagreeing with a rule that found nothing: inv-014 (`gst_type_mismatch` on a co
 IGST invoice, the same as the first run, so it's reproducible) and inv-027 (`price_drift` at
 exactly +5.00%, as in M3). Both go to M6 as the test cases for "disagreement → re-run with
 `Thinking()`".
+
+## D17. API, streaming, CLI and Ask-AP (M5)
+
+**Streaming the extraction.**
+- **`run_stream()` can't retry.** A failed output validation raises *"retries are not supported in
+  `run_stream()` requests"*. The extractor relies on retries (the buyer GSTIN, schema errors), so
+  the extract step keeps `run()` and observes the stream with `event_stream_handler`. A retry then
+  shows up as a new attempt whose partial JSON starts over.
+- **Partial JSON, not partial objects.** `stream_output()` validates every snapshot, and a
+  `RawInvoice` only validates once its last required fields (`subtotal`, `total`, `confidence`)
+  arrive, so it yielded about 2 objects per invoice, both at the very end. SSE instead publishes
+  the output tool's raw argument text parsed with `pydantic_core.from_json(allow_partial=True)`
+  (unvalidated, growing). The validated object is the step's result.
+- **Graph step events come from `graph.iter()`.** It yields each batch of tasks before they run,
+  each with a `node_id`, so no step needed changing. The join appears once per arriving branch
+  (four times).
+- **Events go through an in-process `EventBus`** with replay, so a late subscriber sees the whole
+  run. A single process only; a multi-worker deployment would need Redis or similar.
+
+**Ask-AP.**
+- **The memory is a whole `Conversation`** (messages, usage, id) in `app.sqlite`. Because it
+  carries usage, `UsageLimits(request_limit=30)` is a budget for the conversation; a test proves
+  turn 3 is refused at a limit of 2.
+- **The `session` instructions are `on_change="append"`.** When the user changes mid-conversation,
+  an `InstructionDeltaPart` is appended to the history and the prefix stays the same, so the
+  cached prefix survives.
+- **It reuses `ledger_capability` as is** (`AskDeps` satisfies `HasLedger`), plus local
+  `explain_invoice`, `list_invoices`, `find_vendors` and `vendor_spend`. `vendor_spend` does the sum
+  in code. M6 moves the ledger side to the MCP server.
+
+**The API (FastAPI).**
+- **Two DI systems.** FastAPI `Depends` injects the app-lifetime `Services` built in the lifespan.
+  Routes build the per-run agent deps (who is asking, today) from them. Tests inject `Services`
+  directly, with FunctionModel agents and no lifespan.
+- **`POST /invoices` takes a multipart `file`** or JSON `{"path"}`. Paths must resolve inside
+  `data/`, so the endpoint can't read arbitrary files. Uploads go to `data/runtime/uploads/`. The
+  pipeline runs as a background task; a failure is recorded on the invoice as `status="failed"`
+  with the error, and published to the stream.
+- **Error mapping.** `X-User` is required for approvals. An `ApprovalError` maps to 404 (unknown)
+  or 409 (refused). `UsageLimitExceeded` maps to 429.
+- **`/batches` returns 501** until M7 (DBOS).
+- **No FastAPI tracing:** `logfire.instrument_fastapi` needs `opentelemetry-instrumentation-fastapi`,
+  which isn't on the §19.2 list. The agent and graph spans already cover the work.
+- **A gotcha:** `request.form()` returns *Starlette's* `UploadFile`; FastAPI's is a subclass, so
+  `isinstance` must check the Starlette class.
+
+**The CLI.** `invoiceiq` (typer) replaces `scripts/pipeline.py`. It has `serve`, `ingest`, `run`,
+`watch`, `pending`, `approve`, `deny`, `chat`, `postings`, `costs` and `reset`, all in-process
+through the same service functions as the API. `watch` exists because `curl` isn't installed on
+the dev machine; it also makes the growing JSON readable.
