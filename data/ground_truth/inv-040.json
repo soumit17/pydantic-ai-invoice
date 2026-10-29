@@ -1,0 +1,16 @@
+{
+  "file_id": "inv-040",
+  "file_name": "inv-040.pdf",
+  "category": 14,
+  "category_name": "not_an_invoice",
+  "format": "pdf",
+  "expected": {
+    "kind": "failure",
+    "reason": "not_an_invoice",
+    "missing_fields": [],
+    "detected_document_type": "quotation"
+  },
+  "expected_findings": [],
+  "expected_decision": "rejected",
+  "notes": "a quotation"
+}

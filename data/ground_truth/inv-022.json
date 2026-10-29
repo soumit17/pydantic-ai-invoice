@@ -1,0 +1,74 @@
+{
+  "file_id": "inv-022",
+  "file_name": "inv-022.pdf",
+  "category": 5,
+  "category_name": "fuzzy_duplicate",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Shri Balaji Engineering Works",
+      "gstin": "19ROHUL7539K3ZT",
+      "address": "73/57, Golla Road, Kolkata 700089, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/167",
+    "invoice_date": "2026-10-12",
+    "po_number": "PO-2026-0020",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "5608",
+        "taxable_value": "11216.00",
+        "gst_rate": 5,
+        "cgst": "280.40",
+        "sgst": "280.40",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "43",
+        "unit": "roll",
+        "unit_price": "229",
+        "taxable_value": "9847.00",
+        "gst_rate": 12,
+        "cgst": "590.82",
+        "sgst": "590.82",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "2",
+        "unit": "visit",
+        "unit_price": "3982",
+        "taxable_value": "7964.00",
+        "gst_rate": 18,
+        "cgst": "716.76",
+        "sgst": "716.76",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "29027.00",
+    "total_tax": "3175.96",
+    "total": "32202.96",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "fuzzy_duplicate",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": "posted earlier as INV-26-167"
+}

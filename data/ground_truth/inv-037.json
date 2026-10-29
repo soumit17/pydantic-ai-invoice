@@ -1,0 +1,81 @@
+{
+  "file_id": "inv-037",
+  "file_name": "inv-037.eml",
+  "category": 12,
+  "category_name": "email_clean",
+  "format": "eml",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Howrah Industrial Services",
+      "gstin": "19HQZZX6661T3ZF",
+      "address": "33, Toor Circle, Kolkata 700064, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/077",
+    "invoice_date": "2026-09-15",
+    "po_number": null,
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "12",
+        "unit": "pair",
+        "unit_price": "68",
+        "taxable_value": "816.00",
+        "gst_rate": 12,
+        "cgst": "48.96",
+        "sgst": "48.96",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "64",
+        "unit": "kg",
+        "unit_price": "110",
+        "taxable_value": "7040.00",
+        "gst_rate": 5,
+        "cgst": "176.00",
+        "sgst": "176.00",
+        "igst": "0"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "3997",
+        "taxable_value": "3997.00",
+        "gst_rate": 5,
+        "cgst": "99.93",
+        "sgst": "99.93",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "3",
+        "unit": "pack",
+        "unit_price": "771",
+        "taxable_value": "2313.00",
+        "gst_rate": 18,
+        "cgst": "208.17",
+        "sgst": "208.17",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "14166.00",
+    "total_tax": "1066.12",
+    "total": "15232.12",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

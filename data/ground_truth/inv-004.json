@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-004",
+  "file_name": "inv-004.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Bengal Lubricants Pvt Ltd",
+      "gstin": "19KIOPN9600P5ZS",
+      "address": "154, Sarraf Ganj, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "286",
+    "invoice_date": "2026-09-21",
+    "po_number": null,
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3296",
+        "taxable_value": "3296.00",
+        "gst_rate": 18,
+        "cgst": "296.64",
+        "sgst": "296.64",
+        "igst": "0"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "2814",
+        "taxable_value": "5628.00",
+        "gst_rate": 5,
+        "cgst": "140.70",
+        "sgst": "140.70",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "5",
+        "unit": "pack",
+        "unit_price": "929",
+        "taxable_value": "4645.00",
+        "gst_rate": 18,
+        "cgst": "418.05",
+        "sgst": "418.05",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "1369",
+        "unit": "pcs",
+        "unit_price": "4",
+        "taxable_value": "5476.00",
+        "gst_rate": 18,
+        "cgst": "492.84",
+        "sgst": "492.84",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "10",
+        "unit": "roll",
+        "unit_price": "296",
+        "taxable_value": "2960.00",
+        "gst_rate": 12,
+        "cgst": "177.60",
+        "sgst": "177.60",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "3531",
+        "taxable_value": "3531.00",
+        "gst_rate": 18,
+        "cgst": "317.79",
+        "sgst": "317.79",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "25536.00",
+    "total_tax": "3687.24",
+    "total": "29223.24",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

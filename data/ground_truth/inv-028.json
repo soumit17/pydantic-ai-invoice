@@ -1,0 +1,50 @@
+{
+  "file_id": "inv-028",
+  "file_name": "inv-028.pdf",
+  "category": 7,
+  "category_name": "blocked_vendor",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Western Weld Consumables",
+      "gstin": "27YIJSD8974U3ZO",
+      "address": "76, Saran, Pune 411029, Maharashtra"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "WWC-2026-0073",
+    "invoice_date": "2026-10-24",
+    "po_number": null,
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "669",
+        "unit": "kg",
+        "unit_price": "27",
+        "taxable_value": "18063.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      }
+    ],
+    "subtotal": "18063.00",
+    "total_tax": "0.00",
+    "total": "18063.00",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "blocked_vendor",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": ""
+}

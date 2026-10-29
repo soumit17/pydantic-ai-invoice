@@ -1,0 +1,129 @@
+{
+  "file_id": "inv-002",
+  "file_name": "inv-002.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Maa Durga Packaging Udyog",
+      "gstin": "19CKUIG7204N4ZC",
+      "address": "76/144, Sampath Street, Kolkata 700067, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "MDP/0257/26-27",
+    "invoice_date": "2026-10-06",
+    "po_number": "PO-2026-0002",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "1518",
+        "taxable_value": "3036.00",
+        "gst_rate": 5,
+        "cgst": "75.90",
+        "sgst": "75.90",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "32",
+        "unit": "pair",
+        "unit_price": "87",
+        "taxable_value": "2784.00",
+        "gst_rate": 12,
+        "cgst": "167.04",
+        "sgst": "167.04",
+        "igst": "0"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "54",
+        "unit": "kg",
+        "unit_price": "18",
+        "taxable_value": "972.00",
+        "gst_rate": 0,
+        "cgst": "0.00",
+        "sgst": "0.00",
+        "igst": "0"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3106",
+        "taxable_value": "3106.00",
+        "gst_rate": 18,
+        "cgst": "279.54",
+        "sgst": "279.54",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "1",
+        "unit": "pack",
+        "unit_price": "748",
+        "taxable_value": "748.00",
+        "gst_rate": 18,
+        "cgst": "67.32",
+        "sgst": "67.32",
+        "igst": "0"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "101",
+        "unit": "pcs",
+        "unit_price": "43",
+        "taxable_value": "4343.00",
+        "gst_rate": 12,
+        "cgst": "260.58",
+        "sgst": "260.58",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "16",
+        "unit": "pcs",
+        "unit_price": "219",
+        "taxable_value": "3504.00",
+        "gst_rate": 18,
+        "cgst": "315.36",
+        "sgst": "315.36",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "226",
+        "unit": "pcs",
+        "unit_price": "9",
+        "taxable_value": "2034.00",
+        "gst_rate": 18,
+        "cgst": "183.06",
+        "sgst": "183.06",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "20527.00",
+    "total_tax": "2697.60",
+    "total": "23224.60",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

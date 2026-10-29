@@ -1,0 +1,50 @@
+{
+  "file_id": "inv-029",
+  "file_name": "inv-029.pdf",
+  "category": 8,
+  "category_name": "unknown_vendor",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Narmada Steel Traders",
+      "gstin": "23FUUNU2670C9ZY",
+      "address": "H.No. 639, Lanka Chowk, Indore 452067, Madhya Pradesh"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/075",
+    "invoice_date": "2026-10-02",
+    "po_number": null,
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "5884",
+        "taxable_value": "5884.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1059.12"
+      }
+    ],
+    "subtotal": "5884.00",
+    "total_tax": "1059.12",
+    "total": "6943.12",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "unknown_vendor",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": ""
+}

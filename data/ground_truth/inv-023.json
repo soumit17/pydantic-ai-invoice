@@ -1,0 +1,74 @@
+{
+  "file_id": "inv-023",
+  "file_name": "inv-023.pdf",
+  "category": 5,
+  "category_name": "fuzzy_duplicate",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Coromandel Logistics",
+      "gstin": "33CXBAU4426Y3ZO",
+      "address": "67/527, Mohanty Chowk, Chennai 600039, Tamil Nadu"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/250",
+    "invoice_date": "2026-10-12",
+    "po_number": "PO-2026-0021",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "111",
+        "unit": "pcs",
+        "unit_price": "56",
+        "taxable_value": "6216.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "745.92"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "1",
+        "unit": "roll",
+        "unit_price": "355",
+        "taxable_value": "355.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "42.60"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3062",
+        "taxable_value": "3062.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "551.16"
+      }
+    ],
+    "subtotal": "9633.00",
+    "total_tax": "1339.68",
+    "total": "10972.68",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "fuzzy_duplicate",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": "posted earlier as INV-26-250"
+}

@@ -1,0 +1,62 @@
+{
+  "file_id": "inv-038",
+  "file_name": "inv-038.pdf",
+  "category": 13,
+  "category_name": "foreign_currency",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Lakeside Metrology Inc",
+      "gstin": null,
+      "address": "7133 Harbor Blvd, Oakland, CA 94607, USA"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "292",
+    "invoice_date": "2026-09-27",
+    "po_number": null,
+    "currency": "USD",
+    "line_items": [
+      {
+        "description": "Surface Roughness Tester",
+        "hsn_sac": "9031",
+        "qty": "3",
+        "unit": "unit",
+        "unit_price": "1447",
+        "taxable_value": "4341.00",
+        "gst_rate": null,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0"
+      },
+      {
+        "description": "Calibration Gauge Block Set",
+        "hsn_sac": "9017",
+        "qty": "2",
+        "unit": "set",
+        "unit_price": "341",
+        "taxable_value": "682.00",
+        "gst_rate": null,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "5023.00",
+    "total_tax": "0",
+    "total": "5023.00",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "fx_unverified",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "USD import, no GST"
+}

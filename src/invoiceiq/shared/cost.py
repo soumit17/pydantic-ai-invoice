@@ -40,6 +40,7 @@ def record_response(
         "model": response.model_name,
         "input": usage.input_tokens,
         "output": usage.output_tokens,
+        "reasoning": usage.output_reasoning_tokens,  # thinking tokens, billed as output
         "cache_read": usage.cache_read_tokens,
         "cache_write": usage.cache_write_tokens,
         "usd": str(cost),

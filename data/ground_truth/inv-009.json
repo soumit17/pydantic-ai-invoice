@@ -1,0 +1,129 @@
+{
+  "file_id": "inv-009",
+  "file_name": "inv-009.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Eastern Fasteners & Hardware",
+      "gstin": "19TOTPM6915A8Z2",
+      "address": "38/245, Cheema, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "EFH-2026-0232",
+    "invoice_date": "2026-09-30",
+    "po_number": "PO-2026-0007",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "78",
+        "unit": "pcs",
+        "unit_price": "56",
+        "taxable_value": "4368.00",
+        "gst_rate": 12,
+        "cgst": "262.08",
+        "sgst": "262.08",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "5738",
+        "taxable_value": "5738.00",
+        "gst_rate": 18,
+        "cgst": "516.42",
+        "sgst": "516.42",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "2",
+        "unit": "kg",
+        "unit_price": "86",
+        "taxable_value": "172.00",
+        "gst_rate": 5,
+        "cgst": "4.30",
+        "sgst": "4.30",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "405",
+        "unit": "pcs",
+        "unit_price": "10",
+        "taxable_value": "4050.00",
+        "gst_rate": 18,
+        "cgst": "364.50",
+        "sgst": "364.50",
+        "igst": "0"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "2944",
+        "taxable_value": "2944.00",
+        "gst_rate": 18,
+        "cgst": "264.96",
+        "sgst": "264.96",
+        "igst": "0"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "247",
+        "unit": "kg",
+        "unit_price": "19",
+        "taxable_value": "4693.00",
+        "gst_rate": 0,
+        "cgst": "0.00",
+        "sgst": "0.00",
+        "igst": "0"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "2451",
+        "taxable_value": "2451.00",
+        "gst_rate": 5,
+        "cgst": "61.28",
+        "sgst": "61.28",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "31",
+        "unit": "pair",
+        "unit_price": "84",
+        "taxable_value": "2604.00",
+        "gst_rate": 12,
+        "cgst": "156.24",
+        "sgst": "156.24",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "27020.00",
+    "total_tax": "3259.56",
+    "total": "30279.56",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

@@ -1,0 +1,81 @@
+{
+  "file_id": "inv-013",
+  "file_name": "inv-013.pdf",
+  "category": 2,
+  "category_name": "clean_inter",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Capital Tools Corporation",
+      "gstin": "07WXJIU2937Y7ZC",
+      "address": "90, Mangat Circle, New Delhi 110022, Delhi"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "69",
+    "invoice_date": "2026-10-12",
+    "po_number": "PO-2026-0011",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3164",
+        "taxable_value": "3164.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "569.52"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "458",
+        "unit": "pcs",
+        "unit_price": "6",
+        "taxable_value": "2748.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "494.64"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "123",
+        "unit": "pair",
+        "unit_price": "55",
+        "taxable_value": "6765.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "811.80"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "4138",
+        "taxable_value": "4138.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "206.90"
+      }
+    ],
+    "subtotal": "16815.00",
+    "total_tax": "2082.86",
+    "total": "18897.86",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

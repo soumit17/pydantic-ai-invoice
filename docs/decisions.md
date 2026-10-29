@@ -98,3 +98,88 @@ checks and the evals; leave it unset to use the real date.
   computed by the checks, so the M1 acceptance test really tests the checks.
 - `repos/app_store.py` (invoices, conversations, pending approvals) is deferred to M4, where the
   approval flow decides its schema.
+
+## D8. Generated data is not committed (M2)
+
+All of `data/` is git-ignored, including `ground_truth/`. The spec suggested committing the ground
+truth, but the generator is seeded and a test proves regeneration is byte-identical, so the script
+is the source of truth. A fresh clone runs `uv run python scripts/gen_mockdata.py` first.
+
+## D9. Extractor wiring (M2)
+
+- **Output tools have explicit names** (`ToolOutput(..., name="invoice")` and
+  `name="extraction_failure"`), so traces and tests read clearly. The model chooses the kind by
+  which tool it calls, and text output is disabled.
+- **`retries={'output': 2}`** replaces the spec's `output_retries=2` (see D1).
+- **The buyer-GSTIN validator** raises `ModelRetry` when the buyer isn't us. That is a format or
+  orientation error, which a retry can fix. After 2 retries the run raises
+  `UnexpectedModelBehavior`, and M7 decides what to do with it.
+- **In V2, a retry on an output tool** goes back to the model as that tool's `ToolReturnPart`,
+  carrying the `ModelRetry` message, not as a separate `RetryPromptPart`. Look for that in traces.
+- **PII has two layers.** `PIIRedactionHooks` writes a redacted audit log (logger
+  `invoiceiq.audit`) and returns every request and response unchanged. Logfire's native
+  `ScrubbingOptions` uses the same regex in a callback, so it masks only the numbers inside span
+  attributes. Logfire combines all scrubbing patterns into one regex, so the patterns must not use
+  inline flags like `(?i)`.
+- **No binary content in traces.** `instrument_pydantic_ai(include_binary_content=False)` keeps
+  base64 PDFs and scans out of the spans.
+- **`UsageLimits(cost_limit=...)` exists in 2.63** as a native cost cap for each run. The
+  project-wide cumulative cap still needs the `before_run` hook, because UsageLimits only sees one
+  run.
+- **Live runs go one at a time** in `scripts/run_extraction.py`. Concurrency limiting arrives in
+  M7 with the native mechanism (Rule 0.3).
+
+## D10. Validation-as-retry vs findings (the §7.1 trade-off)
+
+Validation-as-retry is the right tool when the *model* is wrong in a way the document can
+correct: a malformed GSTIN, a missing field, swapped parties. The validator's message tells the
+model what to re-read, and the second attempt usually succeeds.
+
+It is the wrong tool when the *document* is wrong: a vendor's bad multiplication, IGST on an
+intra-state supply. A strict validator would reject the faithful extraction and ask the model to
+"try again" until it produced numbers that pass, which means inventing them. The run would look
+healthy, the invoice would look clean, and the anomaly the audit exists to catch would be gone.
+In this domain, that's the worst kind of failure: confidently wrong, and invisible.
+
+So the extractor's output type validates only format (`RawInvoice`), and content rules run
+afterwards as deterministic checks that produce findings (`strict_validate`). Rule of thumb: if
+a human re-reading the document would *fix* the value, retry. If they would *report* it, make it
+a finding.
+
+## D11. Thinking off for the extractor (M2, after the first live run)
+
+The first live run (40 invoices, tool output) had 10 retries and 3 `UsageLimitExceeded` errors.
+The cost ledger showed 14 requests ending at *exactly* `max_tokens=2048`. A 4-8 line invoice
+needs only about 400-650 tokens of JSON, but requests used 1,400-2,048. Haiku 5.5 uses adaptive
+thinking by default, and the reasoning shares `max_tokens` with the answer, so longer invoices were
+cut off mid-answer and retried. Extraction is copying, not reasoning, so the extractor now has
+`Thinking(effort=False)`. The developer chose this over raising `max_tokens` to keep thinking.
+
+Related findings from the same run:
+- Haiku 5.5 rejects sampling settings, so `temperature` is gone. Pydantic AI had been dropping it
+  with a warning.
+- `AgentInfo.model_settings` in a `FunctionModel` shows only the agent's own settings. Settings
+  that capabilities add (thinking, cache) are merged later and reach `Model.request`, which is
+  where the test checks them.
+- `Caching(messages=False)` works: 99k tokens were read from the cache across the run.
+- Two instruction refinements: descriptions leave out the codes printed beside them ("(HSN
+  4819)"), and `total_tax` may be summed from the printed CGST/SGST/IGST totals when the layout
+  doesn't print it as one figure. That's the single exception to "never compute".
+- The cost ledger now records `reasoning` tokens, and `run_extraction.py -v` prints the message
+  behind every retry.
+
+## D12. Output mode stays `tool` (M2 experiment)
+
+On 10 invoices after the thinking fix, all three modes were 10/10 and 100% on fields. Prompted
+output was cheapest ($0.0058 against $0.0084 for tool output) and had no retries, but n=10 with
+one run each can't separate the modes on accuracy. The cost gap is about $0.0003 per invoice. Tool
+output stays the default for these reasons:
+- **The union decision is visible.** The model picks `submit_invoice` or `report_failure`, which
+  reads clearly in traces and tests.
+- **The schema is sent as a tool definition**, and partial tool arguments are what M5 streams.
+- **Prompted output only validates after generation.** Nothing at the API level holds the model
+  to the schema.
+
+The two retries in tool mode were the model calling an unknown tool `invoke`. The output tools are
+now named `submit_invoice` and `report_failure`. The `gst_rate` instruction now separates a
+printed 0% (`0`) from no rate printed at all (`null`), after inv-028's 0% line came back as null.

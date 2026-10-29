@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-005",
+  "file_name": "inv-005.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Howrah Industrial Services",
+      "gstin": "19HQZZX6661T3ZF",
+      "address": "33, Toor Circle, Kolkata 700064, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/074",
+    "invoice_date": "2026-10-26",
+    "po_number": "PO-2026-0004",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "30",
+        "unit": "pcs",
+        "unit_price": "177",
+        "taxable_value": "5310.00",
+        "gst_rate": 18,
+        "cgst": "477.90",
+        "sgst": "477.90",
+        "igst": "0"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3006",
+        "taxable_value": "3006.00",
+        "gst_rate": 18,
+        "cgst": "270.54",
+        "sgst": "270.54",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "7090",
+        "taxable_value": "7090.00",
+        "gst_rate": 18,
+        "cgst": "638.10",
+        "sgst": "638.10",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "512",
+        "unit": "pcs",
+        "unit_price": "7",
+        "taxable_value": "3584.00",
+        "gst_rate": 18,
+        "cgst": "322.56",
+        "sgst": "322.56",
+        "igst": "0"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "116",
+        "unit": "pcs",
+        "unit_price": "35",
+        "taxable_value": "4060.00",
+        "gst_rate": 12,
+        "cgst": "243.60",
+        "sgst": "243.60",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "30",
+        "unit": "pair",
+        "unit_price": "57",
+        "taxable_value": "1710.00",
+        "gst_rate": 12,
+        "cgst": "102.60",
+        "sgst": "102.60",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "24760.00",
+    "total_tax": "4110.60",
+    "total": "28870.60",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

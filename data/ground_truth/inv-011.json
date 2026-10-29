@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-011",
+  "file_name": "inv-011.pdf",
+  "category": 2,
+  "category_name": "clean_inter",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Deccan Bearings Ltd",
+      "gstin": "27UUSRB1212L5ZF",
+      "address": "74/622, Samra Circle, Pune 411011, Maharashtra"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "DBL-2026-0271",
+    "invoice_date": "2026-09-20",
+    "po_number": "PO-2026-0009",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "5212",
+        "taxable_value": "5212.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "938.16"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "71",
+        "unit": "kg",
+        "unit_price": "81",
+        "taxable_value": "5751.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "287.55"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "1889",
+        "taxable_value": "3778.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "188.90"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "6",
+        "unit": "pack",
+        "unit_price": "852",
+        "taxable_value": "5112.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "920.16"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "90",
+        "unit": "kg",
+        "unit_price": "25",
+        "taxable_value": "2250.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "23",
+        "unit": "pcs",
+        "unit_price": "259",
+        "taxable_value": "5957.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1072.26"
+      }
+    ],
+    "subtotal": "28060.00",
+    "total_tax": "3407.03",
+    "total": "31467.03",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

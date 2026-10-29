@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-017",
+  "file_name": "inv-017.pdf",
+  "category": 3,
+  "category_name": "clean_high_value",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Bengal Lubricants Pvt Ltd",
+      "gstin": "19KIOPN9600P5ZS",
+      "address": "154, Sarraf Ganj, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "288",
+    "invoice_date": "2026-10-05",
+    "po_number": "PO-2026-0015",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Screw Air Compressor 10 HP",
+        "hsn_sac": "8414",
+        "qty": "3",
+        "unit": "unit",
+        "unit_price": "58390",
+        "taxable_value": "175170.00",
+        "gst_rate": 28,
+        "cgst": "24523.80",
+        "sgst": "24523.80",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "6978",
+        "taxable_value": "6978.00",
+        "gst_rate": 18,
+        "cgst": "628.02",
+        "sgst": "628.02",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "7",
+        "unit": "pack",
+        "unit_price": "858",
+        "taxable_value": "6006.00",
+        "gst_rate": 18,
+        "cgst": "540.54",
+        "sgst": "540.54",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "188154.00",
+    "total_tax": "51384.72",
+    "total": "239538.72",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "awaiting_approval",
+  "notes": ""
+}

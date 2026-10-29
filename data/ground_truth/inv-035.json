@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-035",
+  "file_name": "inv-035.png",
+  "category": 11,
+  "category_name": "scan_clean",
+  "format": "png",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Capital Tools Corporation",
+      "gstin": "07WXJIU2937Y7ZC",
+      "address": "90, Mangat Circle, New Delhi 110022, Delhi"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "71",
+    "invoice_date": "2026-10-03",
+    "po_number": "PO-2026-0031",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "14",
+        "unit": "roll",
+        "unit_price": "351",
+        "taxable_value": "4914.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "589.68"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "11",
+        "unit": "pack",
+        "unit_price": "1063",
+        "taxable_value": "11693.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "2104.74"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "193",
+        "unit": "pair",
+        "unit_price": "55",
+        "taxable_value": "10615.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1273.80"
+      }
+    ],
+    "subtotal": "27222.00",
+    "total_tax": "3968.22",
+    "total": "31190.22",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

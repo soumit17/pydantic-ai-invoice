@@ -1,0 +1,129 @@
+{
+  "file_id": "inv-016",
+  "file_name": "inv-016.pdf",
+  "category": 2,
+  "category_name": "clean_inter",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Deccan Bearings Ltd",
+      "gstin": "27UUSRB1212L5ZF",
+      "address": "74/622, Samra Circle, Pune 411011, Maharashtra"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "DBL-2026-0272",
+    "invoice_date": "2026-09-21",
+    "po_number": "PO-2026-0014",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "229",
+        "unit": "pcs",
+        "unit_price": "4",
+        "taxable_value": "916.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "164.88"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "68",
+        "unit": "pcs",
+        "unit_price": "63",
+        "taxable_value": "4284.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "514.08"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "4159",
+        "taxable_value": "4159.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "207.95"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "16",
+        "unit": "kg",
+        "unit_price": "22",
+        "taxable_value": "352.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "2",
+        "unit": "pack",
+        "unit_price": "829",
+        "taxable_value": "1658.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "298.44"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "35",
+        "unit": "pair",
+        "unit_price": "74",
+        "taxable_value": "2590.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "310.80"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "10",
+        "unit": "roll",
+        "unit_price": "399",
+        "taxable_value": "3990.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "478.80"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "11",
+        "unit": "pcs",
+        "unit_price": "121",
+        "taxable_value": "1331.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "239.58"
+      }
+    ],
+    "subtotal": "19280.00",
+    "total_tax": "2214.53",
+    "total": "21494.53",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

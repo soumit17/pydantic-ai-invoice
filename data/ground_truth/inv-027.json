@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-027",
+  "file_name": "inv-027.pdf",
+  "category": 6,
+  "category_name": "price_drift_borderline",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Maa Durga Packaging Udyog",
+      "gstin": "19CKUIG7204N4ZC",
+      "address": "76/144, Sampath Street, Kolkata 700067, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "MDP/0259/26-27",
+    "invoice_date": "2026-09-26",
+    "po_number": "PO-2026-0025",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "7813.05",
+        "taxable_value": "7813.05",
+        "gst_rate": 18,
+        "cgst": "703.17",
+        "sgst": "703.17",
+        "igst": "0"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "150",
+        "unit": "kg",
+        "unit_price": "27",
+        "taxable_value": "4050.00",
+        "gst_rate": 0,
+        "cgst": "0.00",
+        "sgst": "0.00",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "32",
+        "unit": "kg",
+        "unit_price": "97",
+        "taxable_value": "3104.00",
+        "gst_rate": 5,
+        "cgst": "77.60",
+        "sgst": "77.60",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "14967.05",
+    "total_tax": "1561.54",
+    "total": "16528.59",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": "exactly +5.00% on one line: not drift under the strict > 5% rule; the auditor may comment"
+}

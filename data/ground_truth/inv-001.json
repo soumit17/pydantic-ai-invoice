@@ -1,0 +1,81 @@
+{
+  "file_id": "inv-001",
+  "file_name": "inv-001.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Shri Balaji Engineering Works",
+      "gstin": "19ROHUL7539K3ZT",
+      "address": "73/57, Golla Road, Kolkata 700089, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/165",
+    "invoice_date": "2026-09-30",
+    "po_number": "PO-2026-0001",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "4972",
+        "taxable_value": "4972.00",
+        "gst_rate": 18,
+        "cgst": "447.48",
+        "sgst": "447.48",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "18",
+        "unit": "roll",
+        "unit_price": "371",
+        "taxable_value": "6678.00",
+        "gst_rate": 12,
+        "cgst": "400.68",
+        "sgst": "400.68",
+        "igst": "0"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "5129",
+        "taxable_value": "5129.00",
+        "gst_rate": 5,
+        "cgst": "128.23",
+        "sgst": "128.23",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "9",
+        "unit": "pack",
+        "unit_price": "981",
+        "taxable_value": "8829.00",
+        "gst_rate": 18,
+        "cgst": "794.61",
+        "sgst": "794.61",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "25608.00",
+    "total_tax": "3542.00",
+    "total": "29150.00",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

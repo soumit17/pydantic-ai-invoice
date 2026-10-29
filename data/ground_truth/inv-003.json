@@ -1,0 +1,81 @@
+{
+  "file_id": "inv-003",
+  "file_name": "inv-003.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Eastern Fasteners & Hardware",
+      "gstin": "19TOTPM6915A8Z2",
+      "address": "38/245, Cheema, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "EFH-2026-0231",
+    "invoice_date": "2026-10-06",
+    "po_number": "PO-2026-0003",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "2",
+        "unit": "can",
+        "unit_price": "3608",
+        "taxable_value": "7216.00",
+        "gst_rate": 18,
+        "cgst": "649.44",
+        "sgst": "649.44",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "28",
+        "unit": "roll",
+        "unit_price": "275",
+        "taxable_value": "7700.00",
+        "gst_rate": 12,
+        "cgst": "462.00",
+        "sgst": "462.00",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "129",
+        "unit": "kg",
+        "unit_price": "69",
+        "taxable_value": "8901.00",
+        "gst_rate": 5,
+        "cgst": "222.53",
+        "sgst": "222.53",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "33",
+        "unit": "pcs",
+        "unit_price": "236",
+        "taxable_value": "7788.00",
+        "gst_rate": 18,
+        "cgst": "700.92",
+        "sgst": "700.92",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "31605.00",
+    "total_tax": "4069.78",
+    "total": "35674.78",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

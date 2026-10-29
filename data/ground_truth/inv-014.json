@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-014",
+  "file_name": "inv-014.pdf",
+  "category": 2,
+  "category_name": "clean_inter",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Coromandel Logistics",
+      "gstin": "33CXBAU4426Y3ZO",
+      "address": "67/527, Mohanty Chowk, Chennai 600039, Tamil Nadu"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/249",
+    "invoice_date": "2026-09-15",
+    "po_number": "PO-2026-0012",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "1220",
+        "unit": "pcs",
+        "unit_price": "10",
+        "taxable_value": "12200.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "2196.00"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "2",
+        "unit": "can",
+        "unit_price": "3741",
+        "taxable_value": "7482.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1346.76"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "12",
+        "unit": "pack",
+        "unit_price": "788",
+        "taxable_value": "9456.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1702.08"
+      }
+    ],
+    "subtotal": "29138.00",
+    "total_tax": "5244.84",
+    "total": "34382.84",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

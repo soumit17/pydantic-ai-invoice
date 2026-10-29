@@ -1,0 +1,50 @@
+{
+  "file_id": "inv-021",
+  "file_name": "inv-021.pdf",
+  "category": 4,
+  "category_name": "exact_duplicate",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Capital Tools Corporation",
+      "gstin": "07WXJIU2937Y7ZC",
+      "address": "90, Mangat Circle, New Delhi 110022, Delhi"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "70",
+    "invoice_date": "2026-09-01",
+    "po_number": "PO-2026-0019",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "43",
+        "unit": "pack",
+        "unit_price": "658",
+        "taxable_value": "28294.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "5092.92"
+      }
+    ],
+    "subtotal": "28294.00",
+    "total_tax": "5092.92",
+    "total": "33386.92",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "exact_duplicate",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": "resubmission of a posted invoice"
+}

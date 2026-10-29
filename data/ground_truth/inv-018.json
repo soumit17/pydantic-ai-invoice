@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-018",
+  "file_name": "inv-018.pdf",
+  "category": 3,
+  "category_name": "clean_high_value",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Karnataka Motors & Controls",
+      "gstin": "29YRZDX5964V9ZZ",
+      "address": "79/76, Aurora Marg, Bengaluru 560027, Karnataka"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "KMC/0138/26-27",
+    "invoice_date": "2026-09-21",
+    "po_number": "PO-2026-0016",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Screw Air Compressor 10 HP",
+        "hsn_sac": "8414",
+        "qty": "3",
+        "unit": "unit",
+        "unit_price": "33270",
+        "taxable_value": "99810.00",
+        "gst_rate": 28,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "27946.80"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "20",
+        "unit": "roll",
+        "unit_price": "346",
+        "taxable_value": "6920.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "830.40"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "38",
+        "unit": "kg",
+        "unit_price": "29",
+        "taxable_value": "1102.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      }
+    ],
+    "subtotal": "107832.00",
+    "total_tax": "28777.20",
+    "total": "136609.20",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "awaiting_approval",
+  "notes": ""
+}

@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-008",
+  "file_name": "inv-008.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Maa Durga Packaging Udyog",
+      "gstin": "19CKUIG7204N4ZC",
+      "address": "76/144, Sampath Street, Kolkata 700067, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "MDP/0258/26-27",
+    "invoice_date": "2026-10-03",
+    "po_number": null,
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "1831",
+        "taxable_value": "1831.00",
+        "gst_rate": 5,
+        "cgst": "45.78",
+        "sgst": "45.78",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "58",
+        "unit": "kg",
+        "unit_price": "94",
+        "taxable_value": "5452.00",
+        "gst_rate": 5,
+        "cgst": "136.30",
+        "sgst": "136.30",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "139",
+        "unit": "pair",
+        "unit_price": "45",
+        "taxable_value": "6255.00",
+        "gst_rate": 12,
+        "cgst": "375.30",
+        "sgst": "375.30",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "25",
+        "unit": "pcs",
+        "unit_price": "199",
+        "taxable_value": "4975.00",
+        "gst_rate": 18,
+        "cgst": "447.75",
+        "sgst": "447.75",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "7",
+        "unit": "pack",
+        "unit_price": "693",
+        "taxable_value": "4851.00",
+        "gst_rate": 18,
+        "cgst": "436.59",
+        "sgst": "436.59",
+        "igst": "0"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "36",
+        "unit": "pcs",
+        "unit_price": "55",
+        "taxable_value": "1980.00",
+        "gst_rate": 12,
+        "cgst": "118.80",
+        "sgst": "118.80",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "25344.00",
+    "total_tax": "3121.04",
+    "total": "28465.04",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

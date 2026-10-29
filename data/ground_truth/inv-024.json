@@ -1,0 +1,98 @@
+{
+  "file_id": "inv-024",
+  "file_name": "inv-024.pdf",
+  "category": 6,
+  "category_name": "price_drift",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Howrah Industrial Services",
+      "gstin": "19HQZZX6661T3ZF",
+      "address": "33, Toor Circle, Kolkata 700064, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/075",
+    "invoice_date": "2026-09-29",
+    "po_number": "PO-2026-0022",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "122",
+        "unit": "pcs",
+        "unit_price": "51",
+        "taxable_value": "6222.00",
+        "gst_rate": 12,
+        "cgst": "373.32",
+        "sgst": "373.32",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "7804.08",
+        "taxable_value": "7804.08",
+        "gst_rate": 18,
+        "cgst": "702.37",
+        "sgst": "702.37",
+        "igst": "0"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "2",
+        "unit": "can",
+        "unit_price": "3207",
+        "taxable_value": "6414.00",
+        "gst_rate": 18,
+        "cgst": "577.26",
+        "sgst": "577.26",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "110",
+        "unit": "pcs",
+        "unit_price": "7",
+        "taxable_value": "770.00",
+        "gst_rate": 18,
+        "cgst": "69.30",
+        "sgst": "69.30",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "1",
+        "unit": "pcs",
+        "unit_price": "251",
+        "taxable_value": "251.00",
+        "gst_rate": 18,
+        "cgst": "22.59",
+        "sgst": "22.59",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "21461.08",
+    "total_tax": "3489.68",
+    "total": "24950.76",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "price_drift",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "+8% on one line"
+}

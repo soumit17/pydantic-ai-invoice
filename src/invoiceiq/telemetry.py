@@ -6,8 +6,11 @@ spans still exist in-process (evals and local exporters rely on that).
 
 from __future__ import annotations
 
+import logging
+
 import logfire
 
+from invoiceiq.capabilities.pii import scrubbing_options
 from invoiceiq.config import Settings
 
 _configured = False
@@ -25,8 +28,14 @@ def configure_telemetry(settings: Settings, *, console: bool = False) -> None:
         send_to_logfire="if-token-present",
         # console=False keeps script output clean; pass console=True to see spans in the terminal.
         console=None if console else False,
-        scrubbing=False,  # PII redaction is our own PIIRedactionHooks (M2), not Logfire's scrubber.
+        # Mask bank account and phone numbers inside span attributes (prompts, outputs, tool args).
+        scrubbing=scrubbing_options(),
     )
     # Emits agent-run / model-request / tool spans, and silences the first-run banner.
-    logfire.instrument_pydantic_ai()
+    # include_binary_content=False keeps base64 PDFs and scans out of the traces.
+    logfire.instrument_pydantic_ai(include_binary_content=False)
+    # Our own loggers (cost ledger, PII audit log) become Logfire logs inside the current span.
+    app_log = logging.getLogger("invoiceiq")
+    app_log.setLevel(logging.INFO)
+    app_log.addHandler(logfire.LogfireLoggingHandler())
     _configured = True

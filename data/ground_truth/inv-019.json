@@ -1,0 +1,69 @@
+{
+  "file_id": "inv-019",
+  "file_name": "inv-019.pdf",
+  "category": 3,
+  "category_name": "clean_high_value",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Deccan Bearings Ltd",
+      "gstin": "27UUSRB1212L5ZF",
+      "address": "74/622, Samra Circle, Pune 411011, Maharashtra"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "DBL-2026-0273",
+    "invoice_date": "2026-09-26",
+    "po_number": "PO-2026-0017",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Induction Motor 7.5 HP",
+        "hsn_sac": "8501",
+        "qty": "3",
+        "unit": "unit",
+        "unit_price": "30710",
+        "taxable_value": "92130.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "16583.40"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "4",
+        "unit": "pack",
+        "unit_price": "915",
+        "taxable_value": "3660.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "658.80"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "2579",
+        "taxable_value": "5158.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "257.90"
+      }
+    ],
+    "subtotal": "100948.00",
+    "total_tax": "17500.10",
+    "total": "118448.10",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "awaiting_approval",
+  "notes": ""
+}

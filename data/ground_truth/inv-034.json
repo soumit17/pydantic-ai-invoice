@@ -1,0 +1,117 @@
+{
+  "file_id": "inv-034",
+  "file_name": "inv-034.png",
+  "category": 11,
+  "category_name": "scan_clean",
+  "format": "png",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Maa Durga Packaging Udyog",
+      "gstin": "19CKUIG7204N4ZC",
+      "address": "76/144, Sampath Street, Kolkata 700067, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "MDP/0260/26-27",
+    "invoice_date": "2026-09-22",
+    "po_number": "PO-2026-0030",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "3",
+        "unit": "pack",
+        "unit_price": "981",
+        "taxable_value": "2943.00",
+        "gst_rate": 18,
+        "cgst": "264.87",
+        "sgst": "264.87",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "2",
+        "unit": "roll",
+        "unit_price": "434",
+        "taxable_value": "868.00",
+        "gst_rate": 12,
+        "cgst": "52.08",
+        "sgst": "52.08",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "666",
+        "unit": "pcs",
+        "unit_price": "8",
+        "taxable_value": "5328.00",
+        "gst_rate": 18,
+        "cgst": "479.52",
+        "sgst": "479.52",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "24",
+        "unit": "pcs",
+        "unit_price": "144",
+        "taxable_value": "3456.00",
+        "gst_rate": 18,
+        "cgst": "311.04",
+        "sgst": "311.04",
+        "igst": "0"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3067",
+        "taxable_value": "3067.00",
+        "gst_rate": 18,
+        "cgst": "276.03",
+        "sgst": "276.03",
+        "igst": "0"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "5965",
+        "taxable_value": "5965.00",
+        "gst_rate": 5,
+        "cgst": "149.13",
+        "sgst": "149.13",
+        "igst": "0"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "261",
+        "unit": "kg",
+        "unit_price": "20",
+        "taxable_value": "5220.00",
+        "gst_rate": 0,
+        "cgst": "0.00",
+        "sgst": "0.00",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "26847.00",
+    "total_tax": "3065.34",
+    "total": "29912.34",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

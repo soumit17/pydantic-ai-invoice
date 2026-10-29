@@ -1,0 +1,98 @@
+{
+  "file_id": "inv-036",
+  "file_name": "inv-036.png",
+  "category": 11,
+  "category_name": "scan_price_drift",
+  "format": "png",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Howrah Industrial Services",
+      "gstin": "19HQZZX6661T3ZF",
+      "address": "33, Toor Circle, Kolkata 700064, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "INV/26/076",
+    "invoice_date": "2026-09-19",
+    "po_number": "PO-2026-0032",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "72",
+        "unit": "kg",
+        "unit_price": "61",
+        "taxable_value": "4392.00",
+        "gst_rate": 5,
+        "cgst": "109.80",
+        "sgst": "109.80",
+        "igst": "0"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "374",
+        "unit": "pcs",
+        "unit_price": "8",
+        "taxable_value": "2992.00",
+        "gst_rate": 18,
+        "cgst": "269.28",
+        "sgst": "269.28",
+        "igst": "0"
+      },
+      {
+        "description": "Machine Maintenance Service",
+        "hsn_sac": "998719",
+        "qty": "1",
+        "unit": "visit",
+        "unit_price": "6876.10",
+        "taxable_value": "6876.10",
+        "gst_rate": 18,
+        "cgst": "618.85",
+        "sgst": "618.85",
+        "igst": "0"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "32",
+        "unit": "pcs",
+        "unit_price": "141",
+        "taxable_value": "4512.00",
+        "gst_rate": 18,
+        "cgst": "406.08",
+        "sgst": "406.08",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "8",
+        "unit": "pack",
+        "unit_price": "937",
+        "taxable_value": "7496.00",
+        "gst_rate": 18,
+        "cgst": "674.64",
+        "sgst": "674.64",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "26268.10",
+    "total_tax": "4157.30",
+    "total": "30425.40",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "price_drift",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "+10% on one line"
+}

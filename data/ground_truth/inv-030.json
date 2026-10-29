@@ -1,0 +1,86 @@
+{
+  "file_id": "inv-030",
+  "file_name": "inv-030.pdf",
+  "category": 9,
+  "category_name": "gst_type_mismatch",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Salt Lake Safety Supplies",
+      "gstin": "19CKRNU7429Y2ZI",
+      "address": "H.No. 124, Kala Zila, Kolkata 700025, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "SLS-2026-0167",
+    "invoice_date": "2026-09-18",
+    "po_number": "PO-2026-0026",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "58",
+        "unit": "kg",
+        "unit_price": "18",
+        "taxable_value": "1044.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "36",
+        "unit": "pair",
+        "unit_price": "62",
+        "taxable_value": "2232.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "267.84"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "4",
+        "unit": "pack",
+        "unit_price": "1059",
+        "taxable_value": "4236.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "762.48"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "1",
+        "unit": "trip",
+        "unit_price": "3780",
+        "taxable_value": "3780.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "189.00"
+      }
+    ],
+    "subtotal": "11292.00",
+    "total_tax": "1219.32",
+    "total": "12511.32",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "gst_type_mismatch",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": "IGST on an intra-state supply"
+}

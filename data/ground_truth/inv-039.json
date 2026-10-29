@@ -1,0 +1,62 @@
+{
+  "file_id": "inv-039",
+  "file_name": "inv-039.pdf",
+  "category": 13,
+  "category_name": "foreign_currency",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Pacific Gauge Works LLC",
+      "gstin": null,
+      "address": "1314 Harbor Blvd, Oakland, CA 94607, USA"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "PGW-2026-0114",
+    "invoice_date": "2026-09-08",
+    "po_number": null,
+    "currency": "USD",
+    "line_items": [
+      {
+        "description": "Surface Roughness Tester",
+        "hsn_sac": "9031",
+        "qty": "3",
+        "unit": "unit",
+        "unit_price": "1296",
+        "taxable_value": "3888.00",
+        "gst_rate": null,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0"
+      },
+      {
+        "description": "Digital Caliper 0-150 mm",
+        "hsn_sac": "9017",
+        "qty": "1",
+        "unit": "pcs",
+        "unit_price": "54",
+        "taxable_value": "54.00",
+        "gst_rate": null,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "3942.00",
+    "total_tax": "0",
+    "total": "3942.00",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "fx_unverified",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "USD import, no GST"
+}

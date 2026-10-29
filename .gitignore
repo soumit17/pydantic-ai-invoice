@@ -11,8 +11,6 @@ wheels/
 
 # InvoiceIQ
 .env
-data/*
-!data/ground_truth/
 runs/
 .coverage
 .pytest_cache/

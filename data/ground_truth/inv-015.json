@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-015",
+  "file_name": "inv-015.pdf",
+  "category": 2,
+  "category_name": "clean_inter",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Sabarmati Polymers",
+      "gstin": "24DIWXT0424Y2Z8",
+      "address": "25/815, Lad Path, Ahmedabad 380081, Gujarat"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "SP-2026-0092",
+    "invoice_date": "2026-09-19",
+    "po_number": "PO-2026-0013",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "55",
+        "unit": "pair",
+        "unit_price": "90",
+        "taxable_value": "4950.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "594.00"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "9",
+        "unit": "pcs",
+        "unit_price": "48",
+        "taxable_value": "432.00",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "51.84"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "4",
+        "unit": "pack",
+        "unit_price": "774",
+        "taxable_value": "3096.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "557.28"
+      },
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "3551",
+        "taxable_value": "3551.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "639.18"
+      },
+      {
+        "description": "Freight Charges",
+        "hsn_sac": "996511",
+        "qty": "2",
+        "unit": "trip",
+        "unit_price": "2490",
+        "taxable_value": "4980.00",
+        "gst_rate": 5,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "249.00"
+      },
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "101",
+        "unit": "pcs",
+        "unit_price": "11",
+        "taxable_value": "1111.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "199.98"
+      }
+    ],
+    "subtotal": "18120.00",
+    "total_tax": "2291.28",
+    "total": "20411.28",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

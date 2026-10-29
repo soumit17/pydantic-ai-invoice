@@ -1,0 +1,62 @@
+{
+  "file_id": "inv-026",
+  "file_name": "inv-026.pdf",
+  "category": 6,
+  "category_name": "price_drift",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Salt Lake Safety Supplies",
+      "gstin": "19CKRNU7429Y2ZI",
+      "address": "H.No. 124, Kala Zila, Kolkata 700025, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "SLS-2026-0166",
+    "invoice_date": "2026-10-18",
+    "po_number": "PO-2026-0024",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "64",
+        "unit": "pcs",
+        "unit_price": "198.09",
+        "taxable_value": "12677.76",
+        "gst_rate": 18,
+        "cgst": "1141.00",
+        "sgst": "1141.00",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "37",
+        "unit": "pair",
+        "unit_price": "75",
+        "taxable_value": "2775.00",
+        "gst_rate": 12,
+        "cgst": "166.50",
+        "sgst": "166.50",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "15452.76",
+    "total_tax": "2615.00",
+    "total": "18067.76",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "price_drift",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "+6.5% on one line"
+}

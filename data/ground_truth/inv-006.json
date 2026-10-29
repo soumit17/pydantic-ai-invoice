@@ -1,0 +1,105 @@
+{
+  "file_id": "inv-006",
+  "file_name": "inv-006.pdf",
+  "category": 1,
+  "category_name": "clean_intra",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Salt Lake Safety Supplies",
+      "gstin": "19CKRNU7429Y2ZI",
+      "address": "H.No. 124, Kala Zila, Kolkata 700025, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "SLS-2026-0165",
+    "invoice_date": "2026-10-21",
+    "po_number": "PO-2026-0005",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Hydraulic Oil ISO VG 68 (20 L)",
+        "hsn_sac": "2710",
+        "qty": "1",
+        "unit": "can",
+        "unit_price": "4145",
+        "taxable_value": "4145.00",
+        "gst_rate": 18,
+        "cgst": "373.05",
+        "sgst": "373.05",
+        "igst": "0"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "18",
+        "unit": "kg",
+        "unit_price": "26",
+        "taxable_value": "468.00",
+        "gst_rate": 0,
+        "cgst": "0.00",
+        "sgst": "0.00",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "1",
+        "unit": "pack",
+        "unit_price": "831",
+        "taxable_value": "831.00",
+        "gst_rate": 18,
+        "cgst": "74.79",
+        "sgst": "74.79",
+        "igst": "0"
+      },
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "39",
+        "unit": "pair",
+        "unit_price": "63",
+        "taxable_value": "2457.00",
+        "gst_rate": 12,
+        "cgst": "147.42",
+        "sgst": "147.42",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "59",
+        "unit": "kg",
+        "unit_price": "77",
+        "taxable_value": "4543.00",
+        "gst_rate": 5,
+        "cgst": "113.58",
+        "sgst": "113.58",
+        "igst": "0"
+      },
+      {
+        "description": "Printed Label Roll",
+        "hsn_sac": "4821",
+        "qty": "1",
+        "unit": "roll",
+        "unit_price": "431",
+        "taxable_value": "431.00",
+        "gst_rate": 12,
+        "cgst": "25.86",
+        "sgst": "25.86",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "12875.00",
+    "total_tax": "1469.40",
+    "total": "14344.40",
+    "confidence": 1.0
+  },
+  "expected_findings": [],
+  "expected_decision": "auto_approved",
+  "notes": ""
+}

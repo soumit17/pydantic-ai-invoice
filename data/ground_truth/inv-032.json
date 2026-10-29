@@ -1,0 +1,74 @@
+{
+  "file_id": "inv-032",
+  "file_name": "inv-032.pdf",
+  "category": 10,
+  "category_name": "math_error",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Eastern Fasteners & Hardware",
+      "gstin": "19TOTPM6915A8Z2",
+      "address": "38/245, Cheema, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "EFH-2026-0234",
+    "invoice_date": "2026-09-10",
+    "po_number": "PO-2026-0028",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Nitrile Safety Gloves",
+        "hsn_sac": "4015",
+        "qty": "200",
+        "unit": "pair",
+        "unit_price": "60",
+        "taxable_value": "12000.00",
+        "gst_rate": 12,
+        "cgst": "720.00",
+        "sgst": "720.00",
+        "igst": "0"
+      },
+      {
+        "description": "Cotton Waste, industrial",
+        "hsn_sac": "5202",
+        "qty": "42",
+        "unit": "kg",
+        "unit_price": "99",
+        "taxable_value": "4608.00",
+        "gst_rate": 5,
+        "cgst": "115.20",
+        "sgst": "115.20",
+        "igst": "0"
+      },
+      {
+        "description": "Welding Electrode E6013 (5 kg)",
+        "hsn_sac": "8311",
+        "qty": "15",
+        "unit": "pack",
+        "unit_price": "699",
+        "taxable_value": "10485.00",
+        "gst_rate": 18,
+        "cgst": "943.65",
+        "sgst": "943.65",
+        "igst": "0"
+      }
+    ],
+    "subtotal": "27093.00",
+    "total_tax": "3557.70",
+    "total": "30650.70",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "math_error",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "line 2 taxable value ≠ qty × unit price (+₹450)"
+}

@@ -1,0 +1,74 @@
+{
+  "file_id": "inv-025",
+  "file_name": "inv-025.pdf",
+  "category": 6,
+  "category_name": "price_drift",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Deccan Bearings Ltd",
+      "gstin": "27UUSRB1212L5ZF",
+      "address": "74/622, Samra Circle, Pune 411011, Maharashtra"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "DBL-2026-0274",
+    "invoice_date": "2026-10-15",
+    "po_number": "PO-2026-0023",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "M8 Hex Bolt, zinc plated",
+        "hsn_sac": "7318",
+        "qty": "2830",
+        "unit": "pcs",
+        "unit_price": "4",
+        "taxable_value": "11320.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "2037.60"
+      },
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "599",
+        "unit": "kg",
+        "unit_price": "20",
+        "taxable_value": "11980.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      },
+      {
+        "description": "Corrugated Box 5-ply 18x12x12",
+        "hsn_sac": "4819",
+        "qty": "46",
+        "unit": "pcs",
+        "unit_price": "70.56",
+        "taxable_value": "3245.76",
+        "gst_rate": 12,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "389.49"
+      }
+    ],
+    "subtotal": "26545.76",
+    "total_tax": "2427.09",
+    "total": "28972.85",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "price_drift",
+      "severity": "warning"
+    }
+  ],
+  "expected_decision": "awaiting_approval",
+  "notes": "+12% on one line"
+}

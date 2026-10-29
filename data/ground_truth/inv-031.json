@@ -1,0 +1,62 @@
+{
+  "file_id": "inv-031",
+  "file_name": "inv-031.pdf",
+  "category": 9,
+  "category_name": "gst_type_mismatch",
+  "format": "pdf",
+  "expected": {
+    "kind": "invoice",
+    "supplier": {
+      "name": "Bengal Lubricants Pvt Ltd",
+      "gstin": "19KIOPN9600P5ZS",
+      "address": "154, Sarraf Ganj, Kolkata 700066, West Bengal"
+    },
+    "buyer": {
+      "name": "Hooghly Precision Components Pvt Ltd",
+      "gstin": "19ABCDE1234F1Z5",
+      "address": "14 Strand Road, Kolkata 700001, West Bengal"
+    },
+    "invoice_no": "289",
+    "invoice_date": "2026-09-03",
+    "po_number": "PO-2026-0027",
+    "currency": "INR",
+    "line_items": [
+      {
+        "description": "Rice Bran, raw",
+        "hsn_sac": "2302",
+        "qty": "518",
+        "unit": "kg",
+        "unit_price": "20",
+        "taxable_value": "10360.00",
+        "gst_rate": 0,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "0.00"
+      },
+      {
+        "description": "Ball Bearing 6204-2RS",
+        "hsn_sac": "8482",
+        "qty": "42",
+        "unit": "pcs",
+        "unit_price": "171",
+        "taxable_value": "7182.00",
+        "gst_rate": 18,
+        "cgst": "0",
+        "sgst": "0",
+        "igst": "1292.76"
+      }
+    ],
+    "subtotal": "17542.00",
+    "total_tax": "1292.76",
+    "total": "18834.76",
+    "confidence": 1.0
+  },
+  "expected_findings": [
+    {
+      "kind": "gst_type_mismatch",
+      "severity": "critical"
+    }
+  ],
+  "expected_decision": "held",
+  "notes": "IGST on an intra-state supply"
+}
