@@ -14,6 +14,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+import os
 import shutil
 import sqlite3
 import time
@@ -45,8 +46,21 @@ def _run[T](coro: Coroutine[Any, Any, T]) -> T:
     return asyncio.run(coro)
 
 
+def _require_api_key() -> None:
+    """Agents are built eagerly, and the Anthropic provider refuses to construct without a key
+    (spec §2.1), so say so in one line instead of a startup traceback (found in M9's fresh-clone check)."""
+    if not os.environ.get("ANTHROPIC_API_KEY"):
+        typer.echo(
+            "ANTHROPIC_API_KEY is not set: cp .env.example .env and put your key in it.\n"
+            "($0 commands that don't need it: pytest, mcp, postings, costs, reset.)",
+            err=True,
+        )
+        raise typer.Exit(2)
+
+
 def _setup(console: bool = False) -> Settings:
-    settings = get_settings()
+    settings = get_settings()  # exports the key from .env, if it's there
+    _require_api_key()
     configure_telemetry(settings, console=console)
     return settings
 
@@ -81,6 +95,9 @@ def _postings_count(settings: Settings) -> int:
 def serve(host: str = "127.0.0.1", port: int = 8000) -> None:
     """Start the HTTP API."""
     import uvicorn
+
+    get_settings()
+    _require_api_key()
 
     uvicorn.run("invoiceiq.api:app", host=host, port=port)
 

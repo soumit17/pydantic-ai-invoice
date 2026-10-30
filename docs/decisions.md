@@ -623,3 +623,26 @@ to fill here.
   Anthropic runs: 2 `chat` spans per real request. Its `cost` metric matches the ledger, and
   `FunctionModel` runs show 1 span, so the second span comes from the live client path. The headline
   metrics are computed from outputs and aren't affected. Check it in M9 with one Logfire trace.
+
+## D24 — M9: polish and the fresh-clone check (2026-10-30)
+
+**The fresh-clone check caught one real bug.** The check: copy only what git ships into a scratch
+directory, then `uv sync && gen_mockdata && pytest && invoiceiq serve`, with no `.env` and no key.
+- The first three steps passed (194 tests).
+- `serve` crashed on startup with a 30-line traceback. The agents are built eagerly, and the Anthropic
+  provider refuses to construct without `ANTHROPIC_API_KEY` (spec §2.1's first gotcha).
+- **Fix:** every command that builds agents (`serve` and everything through `_setup`) now checks for
+  the key first. Without one, it prints `cp .env.example .env` and exits 2.
+- `tests/test_cli.py` covers it. The test replaces the CLI's settings loader rather than changing
+  directory, because `Settings` reads `.env` by absolute path. An early version of the test picked up
+  the real key and started a real server. No money was spent: model requests are blocked in tests.
+- With a key, `serve` starts and `/healthz` answers in the fresh copy.
+
+**Results table:** `scripts/benchmark.py` runs the 40 invoices one at a time (so each latency is the
+invoice's own), and reports decisions, cost per invoice (from the ledger's invoice ids, with the
+guards' unattributed lines spread evenly) and p50/p95 latency.
+
+**Docs:**
+- README: quick start, architecture diagram, results, demo, layout.
+- `docs/observability.md`: what to capture for spec §15, plus M8's double-span open item.
+- `notes/framework-comparison.md`: the template for the developer's column.
