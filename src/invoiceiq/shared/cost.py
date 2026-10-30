@@ -23,10 +23,39 @@ class BudgetExceeded(RuntimeError):
     """Raised before a run when cumulative spend has reached the project cap."""
 
 
+# provider_response_ids already in each ledger, loaded once per process. A durable run recovered
+# after a crash replays its checkpointed responses through the agent again, and with them the
+# after_model_request hook; the replayed response keeps its id, so it is recognised and skipped (D22).
+_recorded: dict[Path, set[str]] = {}
+
+
+def _recorded_ids(path: Path) -> set[str]:
+    if path not in _recorded:
+        ids: set[str] = set()
+        if path.exists():
+            with path.open(encoding="utf-8") as f:
+                ids = {rid for line in f if line.strip() and (rid := json.loads(line).get("response_id"))}
+        _recorded[path] = ids
+    return _recorded[path]
+
+
 def record_response(
-    response: ModelResponse, *, path: Path, project: str = PROJECT, label: str = ""
+    response: ModelResponse,
+    *,
+    path: Path,
+    project: str = PROJECT,
+    label: str = "",
+    invoice: str | None = None,
 ) -> Decimal:
-    """Price one model response and append it to the ledger. Returns the cost in USD."""
+    """Price one model response and append it to the ledger. Returns the cost in USD.
+
+    Idempotent per provider_response_id: a response already in the ledger (a durable replay) is not
+    recorded or counted again, and costs 0.
+    """
+    response_id = response.provider_response_id
+    seen = _recorded_ids(path)
+    if response_id and response_id in seen:
+        return Decimal(0)
     usage = response.usage
     try:
         cost = response.cost().total_price
@@ -37,6 +66,7 @@ def record_response(
         "ts": datetime.now(UTC).isoformat(timespec="seconds"),
         "project": project,
         "label": label,
+        "invoice": invoice,  # from the run's metadata: cost per invoice, and re-spend checks (M7)
         "model": response.model_name,
         "input": usage.input_tokens,
         "output": usage.output_tokens,
@@ -44,10 +74,13 @@ def record_response(
         "cache_read": usage.cache_read_tokens,
         "cache_write": usage.cache_write_tokens,
         "usd": str(cost),
+        "response_id": response_id,
     }
     path.parent.mkdir(parents=True, exist_ok=True)
     with path.open("a", encoding="utf-8") as f:
         f.write(json.dumps(entry) + "\n")
+    if response_id:
+        seen.add(response_id)
     return cost
 
 

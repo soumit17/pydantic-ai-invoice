@@ -18,9 +18,10 @@ Regenerate docs/pipeline.md with `uv run python -m invoiceiq.pipeline.graph`.
 from __future__ import annotations
 
 import time
-from collections.abc import AsyncIterable
+from collections.abc import AsyncIterable, Awaitable, Callable
 from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Protocol
 
 from pydantic_ai import RunContext
 from pydantic_ai.agent import EventStreamHandler
@@ -53,6 +54,7 @@ from invoiceiq.pipeline import checks
 from invoiceiq.pipeline.documents import load_document as read_document
 from invoiceiq.pipeline.events import EventBus
 from invoiceiq.policy import Policy, to_inr
+from invoiceiq.reliability import describe_failure
 from invoiceiq.repos.app_store import AppStore
 from invoiceiq.repos.ledger import LedgerRepo, open_ledger
 
@@ -81,6 +83,17 @@ class PipelineState:
     audit_escalation: str | None = None
 
 
+class StepRunner(Protocol):
+    """Runs one unit of our own I/O. Directly by default; as a checkpointed DBOS step in a batch, so
+    a recovered workflow returns the recorded result instead of doing the I/O again (M7)."""
+
+    async def __call__[T](self, name: str, fn: Callable[[], Awaitable[T]], /) -> T: ...
+
+
+async def run_directly[T](name: str, fn: Callable[[], Awaitable[T]], /) -> T:
+    return await fn()
+
+
 @dataclass
 class PipelineDeps:
     """Everything injected into the steps. Agents are deps so tests can pass FunctionModel-backed ones."""
@@ -92,7 +105,10 @@ class PipelineDeps:
     extractor: ExtractorAgent
     auditor: AuditorAgent
     poster: PosterAgent
+    # Thinking fixed at construction, for durable runs (D22); None: run_audit adds Thinking per run.
+    escalation_auditor: AuditorAgent | None = None
     events: EventBus | None = None  # set by the API so /invoices/{id}/stream can follow the run
+    run_step: StepRunner = run_directly  # set by the durable batch to a DBOS step runner
 
 
 async def pipeline_deps(
@@ -101,8 +117,11 @@ async def pipeline_deps(
     extractor: ExtractorAgent | None = None,
     auditor: AuditorAgent | None = None,
     poster: PosterAgent | None = None,
+    escalation_auditor: AuditorAgent | None = None,
+    run_step: StepRunner = run_directly,
 ) -> PipelineDeps:
     return PipelineDeps(
+        run_step=run_step,
         settings=settings,
         policy=Policy.from_settings(settings),
         ledger=open_ledger(settings),
@@ -110,6 +129,7 @@ async def pipeline_deps(
         extractor=extractor or build_extractor(settings),
         auditor=auditor or build_auditor(settings),
         poster=poster or build_poster(settings),
+        escalation_auditor=escalation_auditor,
     )
 
 
@@ -161,7 +181,12 @@ async def extract(ctx: Ctx[PipelineState, PipelineDeps, list[UserContent]]) -> R
     # output validation, and the extractor relies on those retries (D17).
     handler = partial_json_publisher(events, ctx.state.invoice_id) if events else None
     result = await ctx.deps.extractor.run(
-        ctx.inputs, deps=deps, usage_limits=EXTRACT_LIMITS, event_stream_handler=handler
+        ctx.inputs,
+        deps=deps,
+        usage_limits=EXTRACT_LIMITS,
+        event_stream_handler=handler,
+        timeout=ctx.deps.settings.run_timeout,
+        metadata={"invoice_id": ctx.state.invoice_id},  # tags this run's cost-ledger lines
     )
     ctx.state.timings["extract"] = round(time.perf_counter() - start, 3)
     return result.output
@@ -171,7 +196,7 @@ async def extract(ctx: Ctx[PipelineState, PipelineDeps, list[UserContent]]) -> R
 async def reject(ctx: Ctx[PipelineState, PipelineDeps, ExtractionFailure]) -> InvoiceRecord:
     ctx.state.decision = ctx.deps.policy.decide([], failure=ctx.inputs)
     record = _record(ctx, status="rejected", extraction=ctx.inputs)
-    await ctx.deps.store.save_invoice(record)
+    await ctx.deps.run_step("save_rejected", lambda: ctx.deps.store.save_invoice(record))
     return record
 
 
@@ -186,22 +211,35 @@ async def strict_validate(ctx: Ctx[PipelineState, PipelineDeps, RawInvoice]) -> 
 @g.step
 async def duplicate_check(ctx: Ctx[PipelineState, PipelineDeps, RawInvoice]) -> list[Finding]:
     raw, ledger = ctx.inputs, ctx.deps.ledger
-    vendor = await ledger.find_vendor(gstin=raw.supplier.gstin, name=raw.supplier.name)
-    posted = await ledger.posted_for_vendor(vendor.vendor_id) if vendor else []
-    return checks.check_duplicates(raw, vendor, posted)
+
+    async def check() -> list[Finding]:
+        # A step, not just a read: after this invoice is posted, a replay would see its own posting
+        # and call it a duplicate. The recorded result keeps a recovered run on the same path.
+        vendor = await ledger.find_vendor(gstin=raw.supplier.gstin, name=raw.supplier.name)
+        posted = await ledger.posted_for_vendor(vendor.vendor_id) if vendor else []
+        return checks.check_duplicates(raw, vendor, posted)
+
+    return await ctx.deps.run_step("duplicate_check", check)
 
 
 @g.step
 async def po_match(ctx: Ctx[PipelineState, PipelineDeps, RawInvoice]) -> list[Finding]:
-    po = await ctx.deps.ledger.get_po(ctx.inputs.po_number) if ctx.inputs.po_number else None
-    return checks.check_po(ctx.inputs, po, threshold_pct=ctx.deps.policy.price_drift_pct)
+    async def check() -> list[Finding]:
+        po = await ctx.deps.ledger.get_po(ctx.inputs.po_number) if ctx.inputs.po_number else None
+        return checks.check_po(ctx.inputs, po, threshold_pct=ctx.deps.policy.price_drift_pct)
+
+    return await ctx.deps.run_step("po_match", check)
 
 
 @g.step
 async def vendor_status(ctx: Ctx[PipelineState, PipelineDeps, RawInvoice]) -> list[Finding]:
     raw = ctx.inputs
-    vendor = await ctx.deps.ledger.find_vendor(gstin=raw.supplier.gstin, name=raw.supplier.name)
-    return checks.check_vendor(raw, vendor)
+
+    async def check() -> list[Finding]:
+        vendor = await ctx.deps.ledger.find_vendor(gstin=raw.supplier.gstin, name=raw.supplier.name)
+        return checks.check_vendor(raw, vendor)
+
+    return await ctx.deps.run_step("vendor_status", check)
 
 
 @g.step
@@ -224,8 +262,10 @@ async def audit(ctx: Ctx[PipelineState, PipelineDeps, list[Finding]]) -> AuditRe
     deps = AuditDeps(ledger=ctx.deps.ledger, policy=ctx.deps.policy, today=ctx.deps.settings.today())
     start = time.perf_counter()
     outcome = await run_audit(
-        ctx.deps.auditor, ctx.state.raw, rule_findings, deps, escalate=ctx.deps.settings.audit_escalation
-    )
+        ctx.deps.auditor, ctx.state.raw, rule_findings, deps,
+        escalate=ctx.deps.settings.audit_escalation, timeout=ctx.deps.settings.run_timeout,
+        metadata={"invoice_id": ctx.state.invoice_id}, escalation_agent=ctx.deps.escalation_auditor,
+    )  # fmt: skip
     ctx.state.timings["audit"] = round(time.perf_counter() - start, 3)
     ctx.state.findings = merge_findings(rule_findings, outcome.report.findings)
     ctx.state.audit = outcome.report
@@ -270,29 +310,44 @@ async def _posting_context(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> P
 async def post(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> InvoiceRecord:
     # LLM step 3, auto path: the poster pauses on post_to_ledger exactly as for a human, and the
     # policy answers through the same resolve() a human approval uses.
-    context = await _posting_context(ctx)
     d = ctx.deps
-    await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
-    record = _record(ctx, status="awaiting_approval")
-    await d.store.save_invoice(record)
-    resolution = await resolve(
-        context.invoice_ref, approve=True, user=POLICY_USER, poster=d.poster, store=d.store, ledger=d.ledger
-    )
-    record.status, record.receipt = resolution.status, resolution.receipt
-    await d.store.save_invoice(record)
-    return record
+
+    async def auto_post() -> InvoiceRecord:
+        # One step. If it's interrupted, all of it re-runs: request_posting re-parks (resetting a
+        # stale claim) and post_to_ledger's idempotency key returns the first posting, not a second.
+        context = await _posting_context(ctx)
+        await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
+        record = _record(ctx, status="awaiting_approval")
+        await d.store.save_invoice(record)
+        resolution = await resolve(
+            context.invoice_ref,
+            approve=True,
+            user=POLICY_USER,
+            poster=d.poster,
+            store=d.store,
+            ledger=d.ledger,
+        )
+        record.status, record.receipt = resolution.status, resolution.receipt
+        await d.store.save_invoice(record)
+        return record
+
+    return await d.run_step("post", auto_post)
 
 
 @g.step
 async def park(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> InvoiceRecord:
     # Needs a human: pause the poster on post_to_ledger and store the Conversation for later.
-    context = await _posting_context(ctx)
     d = ctx.deps
-    await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
-    status = "held" if ctx.inputs.outcome == "held" else "awaiting_approval"
-    record = _record(ctx, status=status)
-    await d.store.save_invoice(record)
-    return record
+
+    async def park_for_approval() -> InvoiceRecord:
+        context = await _posting_context(ctx)
+        await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
+        status = "held" if ctx.inputs.outcome == "held" else "awaiting_approval"
+        record = _record(ctx, status=status)
+        await d.store.save_invoice(record)
+        return record
+
+    return await d.run_step("park", park_for_approval)
 
 
 # --- Edges ---------------------------------------------------------------------------------------
@@ -340,6 +395,27 @@ async def run_pipeline(source: InvoiceSource, deps: PipelineDeps) -> InvoiceReco
                 events.publish(source.invoice_id, {"type": "step", "node": str(task.node_id)})
     assert run.output is not None
     return run.output
+
+
+async def process_invoice(source: InvoiceSource, deps: PipelineDeps) -> InvoiceRecord:
+    """Run the pipeline; a failure becomes a stored `failed` record with a category, not an exception.
+
+    Used by the API, the CLI and the batch, so a failed invoice always says *why* it failed
+    (rate_limited, invalid_output, timeout, usage_limit...) and the rest of a batch carries on.
+    """
+    try:
+        return await run_pipeline(source, deps)
+    except Exception as e:  # BaseExceptions (cancellation, KeyboardInterrupt) still propagate
+        failed = InvoiceRecord(
+            invoice_id=source.invoice_id,
+            file_name=source.path.name,
+            status="failed",
+            error=describe_failure(e),
+        )
+        await deps.run_step("record_failure", lambda: deps.store.save_invoice(failed))
+        if deps.events:
+            deps.events.publish(source.invoice_id, {"type": "error", "error": failed.error})
+        return failed
 
 
 def partial_json_publisher(events: EventBus, invoice_id: str) -> EventStreamHandler[ExtractDeps]:

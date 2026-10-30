@@ -46,6 +46,17 @@ class Settings(BaseSettings):
     mcp_url: str | None = None
     # Re-run the auditor once with Thinking() when it disagrees with the rules (M6, D19).
     audit_escalation: bool = True
+    # At most this many model requests in flight at once, across all agents (M7).
+    model_concurrency: int = 4
+    # Seconds: one model request (all SDK retries included), and one whole agent run (M7).
+    request_timeout: float = 60.0
+    run_timeout: float = 180.0
+    # Durable batches (M7): DBOS keeps its workflow state here, inside data/runtime/.
+    application_version: str = "invoiceiq-p1"
+
+    @property
+    def dbos_url(self) -> str:
+        return f"sqlite:///{self.runtime_dir / 'dbos.sqlite'}"
 
     data_dir: Path = PROJECT_ROOT / "data"
     runs_dir: Path = PROJECT_ROOT / "runs"

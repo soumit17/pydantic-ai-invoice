@@ -77,6 +77,7 @@ class AppStore:
         settings.runtime_dir.mkdir(parents=True, exist_ok=True)
         store = cls(settings.app_db_path)
         async with aiosqlite.connect(store.path) as db:
+            await db.execute("PRAGMA journal_mode=WAL")  # concurrent batch workers: see open_ledger
             await db.executescript(SCHEMA)
             await db.commit()
         return store

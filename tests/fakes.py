@@ -2,13 +2,19 @@
 
 from __future__ import annotations
 
+import asyncio
+import hashlib
 import json
+import os
 import shutil
+import time
 from collections.abc import AsyncIterator
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
+from typing import Literal
 
+from pydantic_ai import BinaryContent
 from pydantic_ai.messages import (
     ModelMessage,
     ModelRequest,
@@ -122,3 +128,97 @@ def fake_ask_ap(settings: Settings) -> AskAgent:
         return ModelResponse(parts=[TextPart(" | ".join(asked))])
 
     return build_ask_ap(settings, model=FunctionModel(fn))
+
+
+# --- batch fakes (M7): one agent, many invoices --------------------------------------------------
+
+
+def _log_call(log: Path | None, agent: str, invoice: str) -> None:
+    if log is not None:
+        with log.open("a", encoding="utf-8") as f:
+            f.write(
+                json.dumps({"agent": agent, "invoice": invoice, "pid": os.getpid(), "t": time.time()}) + "\n"
+            )
+
+
+def fake_router_extractor(
+    settings: Settings, dataset: Path, *, durable: bool = False, delay: float = 0.0, log: Path | None = None
+) -> ExtractorAgent:
+    """Recognises which invoice it is reading (by file hash, or invoice number for email) and answers
+    with that invoice's ground truth. Optionally slow, and logging every call."""
+    by_hash: dict[str, GroundTruth] = {}
+    truths = [
+        GroundTruth.model_validate_json(p.read_text())
+        for p in sorted((dataset / "ground_truth").glob("*.json"))
+    ]
+    for gt in truths:
+        by_hash[hashlib.sha256((dataset / "invoices" / gt.file_name).read_bytes()).hexdigest()] = gt
+
+    def identify(messages: list[ModelMessage]) -> GroundTruth:
+        first = messages[0]
+        assert isinstance(first, ModelRequest)
+        for part in first.parts:
+            if isinstance(part, UserPromptPart) and not isinstance(part.content, str):
+                for item in part.content:
+                    if isinstance(item, BinaryContent):
+                        return by_hash[hashlib.sha256(item.data).hexdigest()]
+                    if isinstance(item, str):
+                        for gt in truths:
+                            if (
+                                isinstance(gt.expected, RawInvoice)
+                                and f"Invoice No: {gt.expected.invoice_no}" in item
+                            ):
+                                return gt
+        raise AssertionError("unknown document")
+
+    async def fn(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        gt = identify(messages)
+        _log_call(log, "extractor", gt.file_id)
+        await asyncio.sleep(delay)
+        tool = INVOICE_TOOL if isinstance(gt.expected, RawInvoice) else FAILURE_TOOL
+        args = json.loads(gt.expected.model_dump_json(exclude={"kind"}))
+        return ModelResponse(
+            parts=[ToolCallPart(tool, args)], usage=RequestUsage(input_tokens=4500, output_tokens=900)
+        )
+
+    return build_extractor(settings, model=FunctionModel(fn, model_name="fake-extractor"), durable=durable)
+
+
+# The batch auditor's one false alarm: without thinking it flags inv-014's (correct) IGST, which
+# escalates the audit; with thinking it withdraws it. So every batch run exercises escalation.
+FALSE_ALARM_ON = "inv-014"
+
+
+def fake_batch_auditor(
+    settings: Settings,
+    dataset: Path,
+    *,
+    durable: bool = False,
+    thinking: Literal["medium"] | Literal[False] = False,
+    delay: float = 0.0,
+    log: Path | None = None,
+) -> AuditorAgent:
+    """Adds no findings, except the FALSE_ALARM_ON warning when thinking is off; logs which invoice
+    it audited (read from the invoice JSON in the prompt)."""
+    ids = {
+        (gt.expected.supplier.name, gt.expected.invoice_no): gt.file_id
+        for p in sorted((dataset / "ground_truth").glob("*.json"))
+        if isinstance((gt := GroundTruth.model_validate_json(p.read_text())).expected, RawInvoice)
+    }
+
+    async def fn(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        prompt = next(p.content for p in messages[0].parts if isinstance(p, UserPromptPart))  # type: ignore[union-attr]
+        inv = json.loads(str(prompt).split("Invoice:\n", 1)[1].split("\n\nTotal:", 1)[0])
+        invoice_id = ids.get((inv["supplier"]["name"], inv["invoice_no"]), "?")
+        thought = thinking is not False  # FunctionModel's AgentInfo doesn't carry the thinking setting
+        _log_call(log, "auditor_thinking" if thought else "auditor", invoice_id)
+        await asyncio.sleep(delay)
+        findings: list[dict[str, str]] = []
+        if invoice_id == FALSE_ALARM_ON and not thought:
+            findings = [{"kind": "gst_type_mismatch", "severity": "warning", "message": "IGST? (wrongly)"}]
+        report = {"findings": findings, "narrative": "Checked.", "suggested_decision": "approve"}
+        return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, report)])
+
+    return build_auditor(
+        settings, model=FunctionModel(fn, model_name="fake-auditor"), durable=durable, thinking=thinking
+    )

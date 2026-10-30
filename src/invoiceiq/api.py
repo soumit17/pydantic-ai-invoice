@@ -14,6 +14,7 @@ app-lifetime objects; Pydantic AI's deps are per-run and carry per-request facts
 from __future__ import annotations
 
 import json
+import uuid
 from collections.abc import AsyncGenerator, AsyncIterator, Awaitable, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
@@ -33,8 +34,9 @@ from invoiceiq.agents.ask_ap import AskAgent, ChatReply, UnknownConversation, bu
 from invoiceiq.approvals import ApprovalError, resolve
 from invoiceiq.config import PROJECT_ROOT, Settings, get_settings
 from invoiceiq.models import InvoiceRecord
+from invoiceiq.pipeline.batch import batch_status, start_runtime, stop_runtime, submit_batch
 from invoiceiq.pipeline.events import EventBus
-from invoiceiq.pipeline.graph import InvoiceSource, PipelineDeps, pipeline_deps, run_pipeline
+from invoiceiq.pipeline.graph import InvoiceSource, PipelineDeps, pipeline_deps, process_invoice
 from invoiceiq.repos.app_store import ApprovalStatus
 from invoiceiq.shared.cost import summary
 from invoiceiq.telemetry import configure_telemetry
@@ -51,13 +53,19 @@ class Services:
     pipeline: PipelineDeps
     ask: AskAgent
     events: EventBus
+    batches: bool = False  # True when this process runs the durable DBOS batch worker
 
 
 async def build_services(settings: Settings) -> Services:
     events = EventBus()
     pipeline = await pipeline_deps(settings)
     pipeline.events = events
-    return Services(settings=settings, pipeline=pipeline, ask=build_ask_ap(settings), events=events)
+    # The durable batch worker runs inside the API process. Launching it also recovers any batch
+    # that was running when the server last died.
+    await start_runtime(settings)
+    return Services(
+        settings=settings, pipeline=pipeline, ask=build_ask_ap(settings), events=events, batches=True
+    )
 
 
 def create_app(
@@ -75,6 +83,8 @@ def create_app(
             configure_telemetry(s)
             app.state.services = await services_factory(s)
         yield
+        if app.state.services.batches:
+            stop_runtime()
 
     app = FastAPI(title="InvoiceIQ", version="0.1.0", lifespan=lifespan)
     if services is not None:
@@ -123,6 +133,10 @@ class ApprovalResult(BaseModel):
     message: str | None
 
 
+class BatchRequest(BaseModel):
+    invoice_ids: list[str] | Literal["all"] = "all"
+
+
 class PathRequest(BaseModel):
     path: str
 
@@ -133,20 +147,9 @@ class ChatRequest(BaseModel):
 
 
 async def _process(svc: Services, source: InvoiceSource) -> None:
-    """Background task: run the graph, publish progress, record failures instead of losing them."""
-    try:
-        record = await run_pipeline(source, svc.pipeline)
-        svc.events.close(source.invoice_id, status=record.status)
-    except Exception as e:  # M7 adds fallback models and retries; here, record and report
-        failed = InvoiceRecord(
-            invoice_id=source.invoice_id,
-            file_name=source.path.name,
-            status="failed",
-            error=f"{type(e).__name__}: {e}",
-        )
-        await svc.pipeline.store.save_invoice(failed)
-        svc.events.publish(source.invoice_id, {"type": "error", "error": failed.error})
-        svc.events.close(source.invoice_id, status="failed")
+    """Background task: run the graph, publish progress; failures are recorded with a category."""
+    record = await process_invoice(source, svc.pipeline)
+    svc.events.close(source.invoice_id, status=record.status)
 
 
 def _routes(app: FastAPI) -> None:  # noqa: C901
@@ -280,13 +283,30 @@ def _routes(app: FastAPI) -> None:  # noqa: C901
         except UsageLimitExceeded as e:
             raise HTTPException(429, f"this conversation has used its budget: {e}") from e
 
-    @app.post("/batches", status_code=501)
-    async def start_batch() -> dict[str, str]:
-        return {"detail": "durable batches arrive in M7 (DBOS)"}
+    @app.post("/batches", status_code=202)
+    async def start_batch(body: BatchRequest, svc: Svc) -> dict[str, Any]:
+        """Start a durable batch over invoice files in data/invoices ("all", or a list of ids)."""
+        if not svc.batches:
+            raise HTTPException(503, "the durable batch worker isn't running in this process")
+        files = sorted((svc.settings.data_dir / "invoices").iterdir())
+        if body.invoice_ids != "all":
+            unknown = set(body.invoice_ids) - {f.stem for f in files}
+            if unknown:
+                raise HTTPException(422, f"no such invoice files: {sorted(unknown)}")
+            files = [f for f in files if f.stem in body.invoice_ids]
+        batch_id = f"batch-{uuid.uuid4().hex[:8]}"
+        await submit_batch(batch_id, [(f.stem, f) for f in files])  # returns at once; the queue works
+        return {"batch_id": batch_id, "invoices": len(files), "status": f"/batches/{batch_id}"}
 
-    @app.get("/batches/{batch_id}", status_code=501)
-    async def get_batch(batch_id: str) -> dict[str, str]:
-        return {"detail": "durable batches arrive in M7 (DBOS)"}
+    @app.get("/batches/{batch_id}")
+    async def get_batch(batch_id: str, svc: Svc) -> dict[str, Any]:
+        """The batch workflow's status, and how many of its invoices are in each state."""
+        if not svc.batches:
+            raise HTTPException(503, "the durable batch worker isn't running in this process")
+        status = await batch_status(batch_id)
+        if status is None:
+            raise HTTPException(404, f"no batch {batch_id}")
+        return status
 
     @app.get("/costs")
     async def costs(svc: Svc) -> dict[str, Any]:

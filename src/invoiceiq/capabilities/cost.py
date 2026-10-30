@@ -39,8 +39,10 @@ def build_cost_hooks(settings: Settings) -> Hooks[object]:
     async def record_cost(
         ctx: RunContext[Any], *, request_context: ModelRequestContext, response: ModelResponse
     ) -> ModelResponse:
-        # One ledger line per model response (so retries are counted), priced by genai-prices.
-        cost = record_response(response, path=settings.costs_path, label=_agent_name(ctx))
+        # One ledger line per model response (so retries are counted, durable replays are not: D22),
+        # priced by genai-prices.
+        invoice = (ctx.metadata or {}).get("invoice_id")
+        cost = record_response(response, path=settings.costs_path, label=_agent_name(ctx), invoice=invoice)
         log.info(
             "%s request %d: in=%d out=%d cache_read=%d $%s",
             _agent_name(ctx),

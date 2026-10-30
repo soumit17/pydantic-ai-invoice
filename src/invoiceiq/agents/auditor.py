@@ -14,10 +14,12 @@ import json
 from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import date
+from typing import Literal
 
 from pydantic_ai import Agent, RunContext
 from pydantic_ai.agent import AgentRunResult
 from pydantic_ai.capabilities import Caching, Thinking
+from pydantic_ai.durable_exec.dbos import DBOSDurability
 from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings, ThinkingLevel
 from pydantic_ai.usage import UsageLimits
@@ -28,6 +30,7 @@ from invoiceiq.capabilities.ledger import ledger_capability
 from invoiceiq.config import Settings
 from invoiceiq.models import AuditFinding, AuditReport, Finding, RawInvoice
 from invoiceiq.policy import Policy
+from invoiceiq.reliability import build_model
 from invoiceiq.repos.ledger import LedgerRepo, open_ledger
 
 AuditorAgent = Agent["AuditDeps", AuditReport]
@@ -76,27 +79,39 @@ not argue with them.
 
 
 def build_auditor(
-    settings: Settings, *, model: Model | str | None = None, caching: bool = True
+    settings: Settings,
+    *,
+    model: Model | str | None = None,
+    caching: bool = True,
+    durable: bool = False,
+    thinking: ThinkingLevel | Literal[False] = False,
 ) -> AuditorAgent:
+    """thinking: build the escalation auditor, with thinking fixed at construction. Durable runs need
+    it: DBOS registers capabilities when the agent is built and rejects a per-run Thinking (D22)."""
     agent: AuditorAgent = Agent(
-        model or settings.model_dev,
+        model or build_model(settings, settings.model_dev),
         deps_type=AuditDeps,
         output_type=AuditReport,
-        name="auditor",
+        # A distinct name: DBOS names the agent's steps after it, so two agents can't share one.
+        name="auditor_thinking" if thinking else "auditor",
         description="Investigates an invoice with ledger tools and explains the findings.",
         instructions=INSTRUCTIONS,
-        model_settings=ModelSettings(max_tokens=settings.max_tokens_default),
+        model_settings=ModelSettings(
+            max_tokens=ESCALATION_MAX_TOKENS if thinking else settings.max_tokens_default,
+            request_timeout=settings.request_timeout,
+        ),
         retries=2,
         capabilities=[
             # Multi-step runs (tool calls) re-send a growing conversation, so cache messages too.
             # caching=False exists only for the M6 caching experiment.
             *([Caching()] if caching else []),
             # Off by default, as in the extractor. M6 adds Thinking() per run for hard cases only,
-            # which is the point of the escalation experiment.
-            Thinking(effort=False),
+            # which is the point of the escalation experiment; the durable batch uses thinking=.
+            Thinking(effort=thinking),
             build_cost_hooks(settings),
             ledger_capability,  # tools + their usage instructions, always loaded
             fx_capability,  # deferred: only a catalog line until the model loads it
+            *([DBOSDurability()] if durable else []),  # model requests as DBOS steps (M7)
         ],
     )
 
@@ -190,23 +205,34 @@ async def run_audit(
     *,
     escalate: bool,
     thinking: ThinkingLevel = "medium",
+    timeout: float | None = None,
+    metadata: dict[str, str] | None = None,
+    escalation_agent: AuditorAgent | None = None,
 ) -> AuditOutcome:
     """Audit once without thinking; if the result disagrees with the rules, audit again *with* it.
 
     Thinking is added for that one run with `capabilities=[Thinking(...)]`, a per-run capability
     merged over the agent's own `Thinking(effort=False)`. Only the invoices that would otherwise
-    change outcome pay for reasoning tokens.
+    change outcome pay for reasoning tokens. Inside a DBOS workflow a per-run capability is
+    rejected, so the durable batch passes `escalation_agent`, built with `thinking=` up front.
     """
     prompt = audit_prompt(invoice, rule_findings, deps.policy)
-    first = await agent.run(prompt, deps=deps, usage_limits=AUDIT_LIMITS)
+    first = await agent.run(prompt, deps=deps, usage_limits=AUDIT_LIMITS, timeout=timeout, metadata=metadata)
     reason = escalation_reason(first.output, rule_findings, invoice.confidence) if escalate else None
     if reason is None:
         return AuditOutcome(first.output, None, None, first)
-    second = await agent.run(
-        prompt,
-        deps=deps,
-        usage_limits=AUDIT_LIMITS,
-        capabilities=[Thinking(effort=thinking)],
-        model_settings=ModelSettings(max_tokens=ESCALATION_MAX_TOKENS),
-    )
+    if escalation_agent is not None:
+        second = await escalation_agent.run(
+            prompt, deps=deps, usage_limits=AUDIT_LIMITS, timeout=timeout, metadata=metadata
+        )
+    else:
+        second = await agent.run(
+            prompt,
+            deps=deps,
+            usage_limits=AUDIT_LIMITS,
+            timeout=timeout,
+            metadata=metadata,
+            capabilities=[Thinking(effort=thinking)],
+            model_settings=ModelSettings(max_tokens=ESCALATION_MAX_TOKENS),
+        )
     return AuditOutcome(second.output, reason, first.output, second)

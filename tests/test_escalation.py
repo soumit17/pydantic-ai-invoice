@@ -111,6 +111,26 @@ async def test_disagreement_reruns_once_with_thinking_and_room_for_it(dataset: P
     ]
 
 
+async def test_a_prebuilt_escalation_agent_replaces_the_per_run_capability(
+    dataset: Path, tmp_path: Path
+) -> None:
+    # The durable batch's path (D22): DBOS rejects capabilities added per run, so escalation runs a
+    # second agent that was built with thinking on, and its own max_tokens headroom.
+    settings = runtime_settings(dataset, tmp_path)
+    gt = truth(dataset, "inv-014")
+    assert isinstance(gt.expected, RawInvoice)
+    first, second = auditor_answering([FALSE_ALARM]), auditor_answering([])
+    escalation = build_auditor(settings, model=second, thinking="medium")
+    assert escalation.name == "auditor_thinking"  # DBOS step names derive from it: must be distinct
+    deps = AuditDeps(ledger=open_ledger(settings), policy=Policy(), today=AS_OF)
+    auditor = build_auditor(settings, model=first)
+    outcome = await run_audit(auditor, gt.expected, [], deps, escalate=True, escalation_agent=escalation)
+    assert outcome.escalation is not None and outcome.report.findings == []
+    assert [(s.get("thinking"), s.get("max_tokens")) for s in first.sent] == [(False, 2048)]
+    expected = [("medium", ESCALATION_MAX_TOKENS)]
+    assert [(s.get("thinking"), s.get("max_tokens")) for s in second.sent] == expected
+
+
 async def test_agreement_runs_once(dataset: Path, tmp_path: Path) -> None:
     model = auditor_answering([])
     outcome = await _audit(dataset, tmp_path, model)

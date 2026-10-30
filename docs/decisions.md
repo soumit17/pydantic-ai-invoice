@@ -443,3 +443,91 @@ withdrawn after thinking. **MCP acceptance:** Ask-AP answered "what did we pay S
 Engineering last quarter?" with INR 36,981.17 over 2 invoices. That matches the ledger (P-00029 +
 P-00030, Aug 2026), reached through `ledger_find_vendor` → `ledger_vendor_spend` over streamable
 HTTP, with `MCP send tools/call` spans visible in the trace.
+
+## D21. Reliability and durable batches (M7)
+
+**Reliability (`reliability.py`), all native mechanisms:**
+- **`FallbackModel(haiku, sonnet, fallback_on=TRANSIENT)`** for the extractor. TRANSIENT is rate
+  limit, unavailable/overloaded, server error, connection and request timeout. The default
+  (`ModelAPIError`) would also fall back on an auth error or an oversized prompt, where Sonnet
+  fails the same way and costs more. A test proves an auth error does *not* fall back.
+  `FallbackModel` is request-level: it can't fall back when *output validation* is exhausted
+  (`UnexpectedModelBehavior`). That case is recorded as `invalid_output` for a human to look at.
+- **A shared `ConcurrencyLimiter`** (`MODEL_CONCURRENCY`, default 4) wraps every agent's model in
+  `ConcurrencyLimitedModel`, so at most N requests are in flight per process, whatever runs them.
+- **Two timeouts from settings.** `ModelSettings['request_timeout']` (60 s) bounds one request,
+  including SDK retries. `run(timeout=...)` (180 s) bounds one agent run and raises `RunTimedOut`.
+  429s are first retried with backoff by the Anthropic SDK itself.
+- **Error categories.** `error_category()` maps the V2 exception hierarchy (`ModelAPIError` and
+  its subclasses, `UsageLimitExceeded`, `RunTimedOut`, `UnexpectedModelBehavior`,
+  `FallbackExceptionGroup`, `BudgetExceeded`) to stable labels. `process_invoice()` turns any
+  failure into a stored `failed` record with `"<category>: <error>"`. The API, the CLI and the batch
+  all use it, so a failed invoice says why it failed and the rest of a batch carries on.
+- **Every agent run carries `metadata={"invoice_id": ...}`**, and `CostHooks` writes it into each
+  cost-ledger line. That gives cost per invoice, and the live crash test's re-spend check.
+
+**The durable batch (`pipeline/batch.py`), DBOS 3.4 on SQLite:**
+- **Each invoice is a child workflow** (`{batch_id}:{invoice_id}`), enqueued in a fixed order on a
+  DBOS queue with `worker_concurrency=4`. The batch workflow waits for them in order. A recovered
+  batch finds the same children and their recorded results.
+- **`DBOSDurability()` on the extractor and auditor:** each model request is a checkpointed
+  step, and the agent names ("extractor", "auditor") must never change. The poster is not durable;
+  its runs happen inside our `post`/`park` steps instead. `DBOSDurability` over
+  `ConcurrencyLimitedModel(FallbackModel(...))` was checked: the fallback works inside the step,
+  and a replay makes zero model calls.
+- **Our own I/O goes through `deps.run_step(name, fn)`:** a direct call normally, and
+  `DBOS.run_step_async` in a batch. That covers the three ledger checks, `post`, `park`,
+  `save_rejected` and `record_failure`. The duplicate check *must* be a step: after an invoice is
+  posted, a replay would see its own posting and call it a duplicate.
+- **The `post` step is safe to re-run.** An interrupted step re-executes:
+  `request_posting` re-parks (resetting a stale `resolving` claim), and `post_to_ledger`'s
+  idempotency key returns the first posting.
+- **dbos 3.x API changes** from what the spec assumed: queues come from
+  `DBOS.register_queue[_async]` (persisted in the system database, so DBOS must be launched first),
+  not `Queue(...)`. The batch workflow registers the queue on first use, idempotently, so a
+  recovered batch can't race the registration. `application_version` is fixed in settings,
+  because DBOS only recovers workflows recorded under the same version.
+- **WAL mode on the runtime `ledger.sqlite` and `app.sqlite`** (never the seed): concurrent batch
+  workers no longer queue on SQLite locks. DBOS's own checkpointing on SQLite still adds 1-3 s per
+  invoice under concurrency. DBOS itself says SQLite is for development; production would use
+  Postgres.
+- **The in-process batch graph** (`run_batch_in_process`) uses the spec's `.map()`: one branch per
+  invoice, joined with `reduce_list_append`. It's fast, but not crash-safe; it backs
+  `invoiceiq run --parallel`.
+
+**Crash test** (`scripts/crash_test.py`, and `pytest -m slow`): fake mode, 40 invoices, `kill -9`
+after 15. Result: 40/40 finished, 40/40 decisions right, 20 postings for 20 posted invoices, 0
+duplicate keys, and 80 model calls (40 extract + 39 audit + exactly 1 repeat, for the invoice in
+flight at the kill). Two harness lessons: kill the worker itself, not a `uv run` wrapper (its child
+survives); and `pkill -f` can match the shell running it.
+
+**Durable execution vs Conversation storage (§11.4).** DBOS keeps one *run* alive through a
+crash. A stored `Conversation` keeps a *thread* alive across requests (Ask-AP, approvals). Neither
+replaces the other, and DBOS isn't used for chat history.
+
+## D22 — M7 live crash test: two bugs the fakes couldn't show (2026-10-30)
+
+The first live `crash_test.py --live` failed: 3 invoices `failed`, plus a reported re-spend on inv-016.
+
+1. **Per-run `Thinking` is rejected inside a DBOS workflow.** `UserError: Capabilities added per-run
+   inside a DBOS workflow are not supported`. DBOSDurability registers durable steps when a capability
+   is bound to the agent, before the workflow starts, so M6's `run(capabilities=[Thinking(...)])` escalation
+   can't run durably. The fake auditor never escalated, so the $0 tests passed.
+   *Fix:* `build_auditor(..., thinking="medium")` builds a second agent, `auditor_thinking` (a distinct
+   name, because DBOS step names derive from it), with thinking and `ESCALATION_MAX_TOKENS` fixed at
+   construction. `start_runtime` passes it as `PipelineDeps.escalation_auditor`, and
+   `run_audit(escalation_agent=)` uses it. In-process runs keep the per-run capability.
+   *Test:* the fake batch auditor now raises a false alarm on inv-014 that its thinking twin withdraws,
+   so every fake batch, and the fake crash test, exercises a durable escalation.
+2. **"Re-spend" was mostly double counting.** After the kill, inv-016's extractor and auditor cost lines
+   were byte-identical to the originals: DBOS replayed the checkpointed responses, but the
+   `after_model_request` hook runs outside the durable step and recorded them again.
+   *Fix:* `record_response` is idempotent per `provider_response_id`, which a replayed response keeps.
+   The only real repeat was the poster, and that was legitimate: `auto_post` saves the `posted` record
+   *inside* its step, the kill landed before the step's checkpoint, and so the step re-ran (and
+   `post_to_ledger`'s idempotency key returned the original posting).
+   *Fix to the test:* "finished before the kill" now means the child workflow is `SUCCESS` in DBOS's
+   `workflow_status`, not "has a terminal record".
+
+Lesson: a fake that never takes a branch doesn't test that branch durably. Every behavior that changes
+how an agent is *called* (per-run capabilities, settings, toolsets) needs one fake path in the crash test.

@@ -24,6 +24,7 @@ from pydantic_ai.usage import UsageLimits
 from invoiceiq.capabilities.cost import build_cost_hooks
 from invoiceiq.config import Settings
 from invoiceiq.models import DecisionOutcome, PostingReceipt
+from invoiceiq.reliability import build_model
 from invoiceiq.repos.ledger import LedgerRepo
 
 PosterAgent = Agent["PostDeps", PostingReceipt | DeferredToolRequests | str]
@@ -82,7 +83,7 @@ def posting_request(context: PostingContext) -> str:
 
 def build_poster(settings: Settings, *, model: Model | str | None = None) -> PosterAgent:
     agent: PosterAgent = Agent(
-        model or settings.model_dev,
+        model or build_model(settings, settings.model_dev),
         deps_type=PostDeps,
         # DeferredToolRequests in the output type is what lets a run *end* on a pending approval
         # instead of executing the tool; str covers the reply after a denial.
@@ -94,7 +95,7 @@ def build_poster(settings: Settings, *, model: Model | str | None = None) -> Pos
         name="poster",
         description="Posts an approved invoice to the ledger (the call itself needs approval).",
         instructions=INSTRUCTIONS,
-        model_settings=ModelSettings(max_tokens=512),
+        model_settings=ModelSettings(max_tokens=512, request_timeout=settings.request_timeout),
         capabilities=[Caching(), Thinking(effort=False), build_cost_hooks(settings)],
     )
 

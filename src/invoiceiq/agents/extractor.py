@@ -8,6 +8,7 @@ from typing import Literal
 
 from pydantic_ai import Agent, ModelRetry, NativeOutput, PromptedOutput, RunContext, ToolOutput
 from pydantic_ai.capabilities import Caching, Thinking
+from pydantic_ai.durable_exec.dbos import DBOSDurability
 from pydantic_ai.models import Model
 from pydantic_ai.output import OutputSpec
 from pydantic_ai.settings import ModelSettings
@@ -17,6 +18,7 @@ from invoiceiq.capabilities.cost import build_cost_hooks
 from invoiceiq.capabilities.pii import build_pii_hooks
 from invoiceiq.config import Settings
 from invoiceiq.models import ExtractionFailure, RawInvoice
+from invoiceiq.reliability import build_model
 
 OutputMode = Literal["tool", "native", "prompted"]
 
@@ -83,16 +85,20 @@ def build_extractor(
     model: Model | str | None = None,
     output_mode: OutputMode = "tool",
     caching: bool = True,
+    durable: bool = False,
 ) -> ExtractorAgent:
     agent: ExtractorAgent = Agent(
-        model or settings.model_dev,
+        # Haiku, falling back to Sonnet on transient provider errors, inside the shared limiter (M7).
+        model or build_model(settings, settings.model_dev, fallback=settings.model_final),
         deps_type=ExtractDeps,
         output_type=_output_type(output_mode),
         name="extractor",
         description="Extracts typed GST invoice data from a PDF, scan or email.",
         instructions=INSTRUCTIONS,
         # No temperature: Haiku 5.5 rejects sampling settings (Pydantic AI drops them with a warning).
-        model_settings=ModelSettings(max_tokens=settings.max_tokens_default),
+        model_settings=ModelSettings(
+            max_tokens=settings.max_tokens_default, request_timeout=settings.request_timeout
+        ),
         # Two chances to fix *format* problems (bad GSTIN pattern, missing field, wrong buyer).
         retries={"output": 2},
         capabilities=[
@@ -105,6 +111,8 @@ def build_extractor(
             Thinking(effort=False),
             build_cost_hooks(settings),
             build_pii_hooks(),
+            # Inside a DBOS workflow, each model request becomes a checkpointed step (M7).
+            *([DBOSDurability()] if durable else []),
         ],
     )
 

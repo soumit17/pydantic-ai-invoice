@@ -240,4 +240,8 @@ def open_ledger(settings: Settings) -> LedgerRepo:
     if not settings.ledger_path.exists():
         settings.runtime_dir.mkdir(parents=True, exist_ok=True)
         shutil.copyfile(settings.ledger_seed_path, settings.ledger_path)
+        # WAL: readers don't wait for the writer, so concurrent invoices in a batch don't queue on
+        # locks (M7). Set once on the runtime copy only; the committed seed stays untouched.
+        with sqlite3.connect(settings.ledger_path) as db:
+            db.execute("PRAGMA journal_mode=WAL")
     return LedgerRepo(settings.ledger_path)

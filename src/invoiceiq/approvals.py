@@ -48,6 +48,7 @@ async def request_posting(
         posting_request(context),
         deps=PostDeps(ledger=ledger, context=context, posted_by="(not yet approved)"),
         usage_limits=POST_LIMITS,
+        metadata={"invoice_id": context.invoice_ref},
     )
     if not isinstance(result.output, DeferredToolRequests):
         raise ApprovalError(f"the poster did not ask to post {context.invoice_ref}: {result.output!r}")
@@ -105,6 +106,7 @@ async def resolve(
             deferred_tool_results=requests.build_results(approvals=answers),
             deps=PostDeps(ledger=ledger, context=context, posted_by=user),
             usage_limits=POST_LIMITS,
+            metadata={"invoice_id": context.invoice_ref},
         )
     except BaseException:
         await store.release_pending(invoice_id)

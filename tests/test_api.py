@@ -156,7 +156,8 @@ async def test_costs_health_and_batches(client: httpx.AsyncClient) -> None:
     assert (await client.get("/healthz")).json() == {"ok": True}
     costs = (await client.get("/costs")).json()
     assert costs["cap_usd"] == "6.0" and "total_usd" in costs
-    assert (await client.post("/batches")).status_code == 501
+    # Test apps don't run the DBOS worker (the crash test covers batches end to end).
+    assert (await client.post("/batches", json={"invoice_ids": "all"})).status_code == 503
 
 
 async def _data_file(client: httpx.AsyncClient, name: str) -> Path:

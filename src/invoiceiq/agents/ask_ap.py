@@ -26,6 +26,7 @@ from invoiceiq.capabilities.ledger import ledger_capability
 from invoiceiq.config import Settings
 from invoiceiq.mcp_server import Spend, build_mcp_server
 from invoiceiq.models import InvoiceStatus, Vendor
+from invoiceiq.reliability import build_model
 from invoiceiq.repos.app_store import AppStore
 from invoiceiq.repos.ledger import LedgerRepo
 
@@ -93,13 +94,13 @@ def build_ask_ap(
     settings: Settings, *, model: Model | str | None = None, ledger: LedgerAccess = "mcp"
 ) -> AskAgent:
     agent: AskAgent = Agent(
-        model or settings.model_dev,
+        model or build_model(settings, settings.model_dev),
         deps_type=AskDeps,
         output_type=str,
         name="ask_ap",
         description="Answers AP questions about invoices, vendors and spend.",
         instructions=INSTRUCTIONS,
-        model_settings=ModelSettings(max_tokens=1024),
+        model_settings=ModelSettings(max_tokens=1024, request_timeout=settings.request_timeout),
         capabilities=[
             Caching(),  # long conversations re-send their history every turn: cache it
             Thinking(effort=False),

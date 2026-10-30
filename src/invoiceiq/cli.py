@@ -2,7 +2,8 @@
 
 Commands (LIVE = calls the model and costs money; the rest are $0):
 - serve: the HTTP API on :8000. watch ID: follow its SSE stream for one invoice.
-- ingest FILE..., run [--fresh]: LIVE, the pipeline on files, or on all 40 against ground truth.
+- ingest FILE..., run [--fresh] [--parallel]: LIVE, the pipeline on files, or on all 40 vs ground truth.
+- batch [IDS] [--batch-id ID] [--fresh]: LIVE, a durable DBOS batch that survives kill -9 and resumes.
 - pending, approve ID --user U [--note N] [--amount A], deny ID --user U --note N: approvals.
 - chat --user U [--mcp-url URL | --local]: LIVE, Ask-AP with memory; the ledger over MCP.
 - mcp [--http HOST:PORT]: the ledger MCP server, over stdio (Claude Code) or streamable HTTP.
@@ -17,6 +18,7 @@ import shutil
 import sqlite3
 import time
 from collections.abc import Coroutine
+from datetime import datetime
 from decimal import Decimal
 from pathlib import Path
 from typing import Annotated, Any
@@ -27,7 +29,9 @@ from invoiceiq.agents.ask_ap import UnknownConversation, build_ask_ap, chat
 from invoiceiq.approvals import ApprovalError, resolve
 from invoiceiq.config import Settings, get_settings
 from invoiceiq.models import GroundTruth, InvoiceRecord
-from invoiceiq.pipeline.graph import InvoiceSource, PipelineDeps, pipeline_deps, run_pipeline
+from invoiceiq.pipeline.batch import run_batch_in_process, start_runtime, stop_runtime, submit_batch
+from invoiceiq.pipeline.graph import InvoiceSource, PipelineDeps, pipeline_deps, process_invoice
+from invoiceiq.repos.app_store import AppStore
 from invoiceiq.shared.cost import check_budget, summary, total_spend
 from invoiceiq.telemetry import configure_telemetry
 
@@ -122,7 +126,7 @@ def ingest(
                 continue
             invoice_id = await deps.store.new_invoice_id(path.stem)
             start = time.perf_counter()
-            record = await run_pipeline(InvoiceSource(invoice_id, path), deps)
+            record = await process_invoice(InvoiceSource(invoice_id, path), deps)
             _print_record(record, seconds=time.perf_counter() - start)
             if verbose and record.audit:
                 typer.echo(f"       narrative: {record.audit.narrative}")
@@ -138,47 +142,108 @@ def run_all(
     fresh: Annotated[
         bool, typer.Option("--fresh", help="Reset data/runtime/ first (a clean ledger).")
     ] = False,
+    parallel: Annotated[
+        bool, typer.Option("--parallel", help="All at once via the .map() batch graph (model calls capped).")
+    ] = False,
     verbose: Annotated[bool, typer.Option("-v", "--verbose")] = False,
     console: Console = False,
 ) -> None:
-    """LIVE: run the mock invoices and compare each decision with the ground truth."""
+    """LIVE: run the mock invoices in-process and compare each decision with the ground truth."""
 
     async def go() -> None:
         settings = _setup(console)
         spent_before = check_budget(path=settings.costs_path, cap_usd=settings.spend_cap_usd)
-        files = sorted((settings.data_dir / "invoices").iterdir())
-        if ids:
-            files = [f for f in files if f.stem in ids]
-        if fresh:
-            shutil.rmtree(settings.runtime_dir, ignore_errors=True)
-        elif (n := _postings_count(settings)) > 0:
-            typer.echo(f"note: the runtime ledger already holds {n} posting(s) from earlier runs; re-running")
-            typer.echo(
-                "      those invoices will (correctly) be held as duplicates. Use --fresh to start clean.\n"
-            )
+        files = _select(settings, ids)
+        _prepare_runtime(settings, fresh)
         deps = await pipeline_deps(settings)
         typer.echo(f"running {len(files)} invoice(s) through the graph; spent so far ${spent_before:.4f}\n")
-        matches = 0
-        for path in files:
-            start = time.perf_counter()
-            try:
-                record = await run_pipeline(InvoiceSource(path.stem, path), deps)
-            except Exception as e:  # M7 adds proper error handling; here, report and carry on
-                typer.echo(f"ERR  {path.stem}  {type(e).__name__}: {e}")
-                continue
-            gt_path = settings.data_dir / "ground_truth" / f"{path.stem}.json"
-            expected = (
-                GroundTruth.model_validate_json(gt_path.read_text()).expected_decision
-                if gt_path.exists()
-                else None
-            )
-            matches += _print_record(record, expected=expected, seconds=time.perf_counter() - start)
-            if verbose and record.audit:
-                typer.echo(f"       narrative: {record.audit.narrative}")
+        started, matches = time.perf_counter(), 0
+        if parallel:
+            for record in await run_batch_in_process([InvoiceSource(p.stem, p) for p in files], deps):
+                matches += _report(settings, record, None, verbose)
+        else:
+            for path in files:
+                start = time.perf_counter()
+                record = await process_invoice(InvoiceSource(path.stem, path), deps)
+                matches += _report(settings, record, time.perf_counter() - start, verbose)
         typer.echo(f"\ndecisions matching ground truth: {matches}/{len(files)}")
+        typer.echo(f"time: {time.perf_counter() - started:.1f}s")
         typer.echo(f"cost: ${total_spend(path=settings.costs_path) - spent_before:.4f}")
 
     _run(go())
+
+
+@app.command()
+def batch(
+    ids: Annotated[
+        list[str] | None, typer.Argument(help="Invoice ids (default: all in data/invoices).")
+    ] = None,
+    batch_id: Annotated[
+        str | None, typer.Option("--batch-id", help="Reuse an id to resume that batch after a crash.")
+    ] = None,
+    fresh: Annotated[
+        bool, typer.Option("--fresh", help="Reset data/runtime/ first (ledger, DBOS state).")
+    ] = False,
+    console: Console = False,
+) -> None:
+    """LIVE: a durable batch (DBOS). kill -9 it any time; run it again with the same --batch-id and it
+    resumes: finished invoices aren't redone, and nothing is posted twice."""
+
+    async def go() -> None:
+        settings = _setup(console)
+        spent_before = check_budget(path=settings.costs_path, cap_usd=settings.spend_cap_usd)
+        files = _select(settings, ids)
+        _prepare_runtime(settings, fresh)
+        bid = batch_id or f"batch-{datetime.now():%Y%m%d-%H%M%S}"
+        await start_runtime(settings)  # launch() also recovers this batch if it crashed earlier
+        typer.echo(f"batch {bid}: {len(files)} invoice(s), durable (resume with --batch-id {bid})\n")
+        started = time.perf_counter()
+        try:
+            handle = await submit_batch(bid, [(p.stem, p) for p in files])
+            results = await handle.get_result()
+        finally:
+            stop_runtime()
+        store = await AppStore.open(settings)
+        matches = 0
+        for item in results:
+            record = await store.get_invoice(item["invoice_id"])
+            if record is not None:
+                matches += _report(settings, record, None, False)
+        typer.echo(f"\ndecisions matching ground truth: {matches}/{len(results)}")
+        typer.echo(f"time: {time.perf_counter() - started:.1f}s")
+        typer.echo(f"cost: ${total_spend(path=settings.costs_path) - spent_before:.4f}")
+
+    _run(go())
+
+
+def _select(settings: Settings, ids: list[str] | None) -> list[Path]:
+    files = sorted((settings.data_dir / "invoices").iterdir())
+    return [f for f in files if f.stem in ids] if ids else files
+
+
+def _prepare_runtime(settings: Settings, fresh: bool) -> None:
+    if fresh:
+        shutil.rmtree(settings.runtime_dir, ignore_errors=True)
+    elif (n := _postings_count(settings)) > 0:
+        typer.echo(f"note: the runtime ledger already holds {n} posting(s) from earlier runs; re-running")
+        typer.echo(
+            "      those invoices will (correctly) be held as duplicates. Use --fresh to start clean.\n"
+        )
+
+
+def _report(settings: Settings, record: InvoiceRecord, seconds: float | None, verbose: bool) -> bool:
+    """Print one invoice against its ground truth; True if the decision matches."""
+    if record.status == "failed":
+        typer.echo(f"ERR  {record.invoice_id}  {record.error}")
+        return False
+    gt_path = settings.data_dir / "ground_truth" / f"{record.invoice_id}.json"
+    expected = (
+        GroundTruth.model_validate_json(gt_path.read_text()).expected_decision if gt_path.exists() else None
+    )
+    ok = _print_record(record, expected=expected, seconds=seconds)
+    if verbose and record.audit:
+        typer.echo(f"       narrative: {record.audit.narrative}")
+    return ok
 
 
 @app.command()

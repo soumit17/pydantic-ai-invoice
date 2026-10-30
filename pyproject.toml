@@ -14,7 +14,7 @@ dependencies = [
     "httpx==0.28.1",
     "mcp==2.3.0",
     "pillow==13.0.0",
-    "pydantic-ai-slim[anthropic,evals,logfire,mcp]==2.63.0",
+    "pydantic-ai-slim[anthropic,dbos,evals,logfire,mcp]==2.63.0",
     "pydantic-evals==2.63.0",
     "pydantic-graph==2.63.0",
     "pydantic-settings==2.16.2",
@@ -45,7 +45,8 @@ dev = [
 testpaths = ["tests"]
 asyncio_mode = "auto"
 asyncio_default_fixture_loop_scope = "function"
-addopts = "-q"
+addopts = "-q -m 'not slow'"
+markers = ["slow: takes more than a few seconds; run with `pytest -m slow`"]
 
 [tool.pyright]
 include = ["src"]
