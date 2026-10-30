@@ -1,0 +1,101 @@
+{
+  "model": "anthropic:claude-haiku-5-5",
+  "cost_usd": "0.002359620",
+  "rows": [
+    {
+      "file_id": "inv-001",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice INV/26/165 from Shri Balaji Engineering Works (active vendor V001, PO-2026-0001) totals \u20b929,150.00 and is within the \u20b950,000 auto-approve limit. All four lines match the open PO on quantity, unit price and GST rate, and no duplicate of this invoice number exists in the posted ledger. The deterministic checks raised no findings, so the invoice is clean on these checks.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "vendor_history",
+        "search_posted",
+        "vendor_history",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 4,
+      "input_tokens": 15643,
+      "output_tokens": 536,
+      "cache_read_tokens": 11203,
+      "seconds": 5.46
+    },
+    {
+      "file_id": "inv-002",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "All eight invoice unit prices match PO-2026-0002 exactly; quantities and GST rates also match the PO lines.",
+          "evidence": {
+            "po_number": "PO-2026-0002"
+          },
+          "source": "llm"
+        }
+      ],
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice MDP/0257/26-27 from Maa Durga Packaging Udyog (active vendor V002) for \u20b923,224.60 against PO-2026-0002. Every line matches the PO on price, quantity and GST rate, and no duplicate was found among posted invoices for this vendor. The total is above the \u20b950,000 auto-approve limit only if you consider it; at \u20b923,224.60 it is below, so the approval routing is set by policy code.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13134,
+      "output_tokens": 588,
+      "cache_read_tokens": 10178,
+      "seconds": 5.52
+    },
+    {
+      "file_id": "inv-003",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [
+        {
+          "kind": "stale_date",
+          "severity": "info",
+          "message": "Invoice dated 2026-10-06 is 23 days old; within normal payment window, no action needed.",
+          "evidence": {
+            "invoice_date": "2026-10-06",
+            "today": "2026-10-29"
+          },
+          "source": "llm"
+        }
+      ],
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Eastern Fasteners & Hardware (V003, active) invoice EFH-2026-0231 for \u20b935,674.78 matches open PO-2026-0003 line for line: quantities, unit prices, HSN codes and GST rates all agree, and there is no duplicate in posted invoices. The total exceeds the \u20b950,000 auto-approve limit? No, it is below it, so the invoice is within auto-approve range. The deterministic checks reported no findings, and the only observation is that the invoice is 23 days old, which needs no action.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 11091,
+      "output_tokens": 581,
+      "cache_read_tokens": 8821,
+      "seconds": 7.18
+    }
+  ]
+}

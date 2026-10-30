@@ -1,0 +1,585 @@
+{
+  "stats": {
+    "off": {
+      "audits": 12,
+      "false_pos": 3,
+      "decisions_ok": 9,
+      "escalated": 0,
+      "reasoning": 0,
+      "output": 9295,
+      "usd": "0.006734310"
+    },
+    "escalation": {
+      "audits": 12,
+      "false_pos": 0,
+      "decisions_ok": 12,
+      "escalated": 3,
+      "reasoning": 2832,
+      "output": 14220,
+      "usd": "0.009971490"
+    },
+    "always": {
+      "audits": 12,
+      "false_pos": 0,
+      "decisions_ok": 12,
+      "escalated": 0,
+      "reasoning": 8340,
+      "output": 15017,
+      "usd": "0.011622275"
+    }
+  },
+  "runs": [
+    {
+      "case": "inv-014",
+      "repeat": 0,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Invoice INV/26/249 from Coromandel Logistics (active vendor V010, matched to open PO-2026-0012) totals \u20b934,382.84, which is within the \u20b950,000 auto-approve limit. Unit prices match the PO exactly, the invoice is not a duplicate of any posted invoice, and the arithmetic and tax treatment are consistent. No issues were found, so the invoice can proceed to payment."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 0,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (V010, active) invoice INV/26/249 for \u20b934,382.84 matches open PO-2026-0012 on quantities, unit prices and HSN codes, and no prior posting of this invoice exists. The total is within the \u20b950,000 auto-approve limit, and no deterministic or ledger issues were found. The invoice is suitable for approval."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 0,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (active vendor V010) submitted invoice INV/26/249 for \u20b934,382.84 against open PO-2026-0012. Prices, quantities, GST treatment and arithmetic all match the PO and the invoice, and no duplicate was found in the posted ledger. The total is within the \u20b950,000 auto-approve limit, so no further action is needed."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 1,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (active vendor V010) has invoiced INV/26/249 for \u20b934,382.84 against open PO-2026-0012, with all unit prices and quantities matching the PO. No duplicate exists in posted invoices and the tax treatment is correct for an inter-state supply. The total is within the \u20b950,000 auto-approve limit, so approval is routine."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 1,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Invoice INV/26/249 from Coromandel Logistics (vendor V010, active) for \u20b934,382.84 against PO-2026-0012 is within the \u20b950,000 auto-approve limit. All three line prices match the PO exactly, and no prior invoice with this number exists in the ledger. No findings were raised beyond the deterministic checks, which reported none."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 1,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (vendor V010, active) invoice INV/26/249 for \u20b934,382.84 matches PO-2026-0012 line for line on quantity and unit price, and the PO is open. No duplicate was found: the invoice-number search returned nothing, and the vendor's only other recent invoice is INV-26-250 with a different amount. The total is within the \u20b950,000 auto-approve limit, and no deterministic findings were raised."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 2,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (V010, active) invoice INV/26/249 for \u20b934,382.84 matches PO-2026-0012 on prices, quantities and HSN codes, and the vendor is not blocked. No duplicate was found in posted invoices, and the IGST treatment fits the inter-state supply. The total is within the \u20b950,000 auto-approve limit, and no deterministic or LLM findings were raised."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 2,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Invoice INV/26/249 from Coromandel Logistics (active vendor V010) for \u20b934,382.84 matches PO-2026-0012 on every line, with no price drift and no duplicate in the posted invoices. The total is within the \u20b950,000 auto-approve limit, and the deterministic checks raised no issues. Based on the ledger checks, it can be approved for payment."
+    },
+    {
+      "case": "inv-014",
+      "repeat": 2,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Coromandel Logistics (vendor V010, active) submitted INV/26/249 dated 15 September 2026 for \u20b934,382.84 against PO-2026-0012, which is open and matches the invoice's quantities and unit prices. No duplicate was found in posted invoices, and the total is within the \u20b950,000 auto-approve limit. Nothing needs action."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "off",
+      "false_positives": [
+        "price_drift"
+      ],
+      "decision": "awaiting_approval",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Machine Maintenance Service is invoiced at \u20b97813.05 against a PO price of \u20b97441.00, a drift of about 5.0%.",
+          "evidence": {
+            "invoice_unit_price": "7813.05",
+            "po_unit_price": "7441.00",
+            "drift": "(7813.05-7441)/7441 = 5.00%"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) invoiced \u20b916,528.59 under PO-2026-0025, which is open. The machine maintenance line is priced at \u20b97,813.05 against a PO price of \u20b97,441.00, a drift of about 5.00%, which sits exactly at the 5.0% threshold and needs a human check. The total is within the \u20b950,000 auto-approve limit, but the price warning requires approval."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": "auditor disagrees with the rules: warning price_drift",
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at \u20b97813.05 against a PO price of \u20b97441.00, a 5.00% increase. This is exactly at the 5.0% threshold, so it is not flagged.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (V002, active) has invoiced MDP/0259/26-27 for \u20b916,528.59 against open PO-2026-0025. Totals, GST treatment and duplicate checks all pass. The only observation is that the maintenance service line is exactly 5.00% above the PO price, which is at the threshold and needs no action."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Line 1 (Machine Maintenance Service) is billed at \u20b97813.05 against PO price \u20b97441.00, a 5.00% increase that sits exactly at the 5.0% threshold. No action is needed.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) invoice MDP/0259/26-27 for \u20b916,528.59 is against open PO-2026-0025. The only observation is that the machine maintenance line is 5.00% above the PO price, exactly at the threshold, which is informational. The total is within the \u20b950,000 auto-approve limit."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 1,
+      "mode": "off",
+      "false_positives": [
+        "price_drift"
+      ],
+      "decision": "awaiting_approval",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Line 1 (Machine Maintenance Service) is billed at \u20b97813.05 against the PO price of \u20b97441.00, an increase of about 5.0%. This is at the 5.0% threshold, so it is flagged for a human to confirm.",
+          "evidence": {
+            "invoice_unit_price": "7813.05",
+            "po_unit_price": "7441.00",
+            "drift_pct": "5.00"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against PO-2026-0025. The machine maintenance line is billed at \u20b97,813.05 versus the PO price of \u20b97,441.00, a 5.0% increase that sits right at the drift threshold and needs a human check. The total is within the \u20b950,000 auto-approve limit, but the price warning means it should be reviewed rather than auto-approved."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 1,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": "auditor disagrees with the rules: warning price_drift",
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Line 1 (Machine Maintenance Service) is billed at 7813.05 against the PO price of 7441.00, a 5.00% increase. This is exactly at the 5.0% threshold, so it is not flagged as drift.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against open PO-2026-0025, which is within the auto-approve limit. The only observation is that the maintenance service line is billed exactly 5.00% above the PO rate, which is at the threshold and needs no action. No duplicate, GST, math, or date issues were found."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 1,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at \u20b97,813.05 against a PO price of \u20b97,441.00, a 5.00% increase. This is exactly at the 5.0% threshold, so it is not flagged as drift.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has submitted invoice MDP/0259/26-27 for \u20b916,528.59 against open PO-2026-0025. The only observation is that the maintenance service line is billed exactly 5.00% above the PO price, which is at the threshold and not over it. The total is within the \u20b950,000 auto-approve limit and no duplicate was found, so the invoice can be approved."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 2,
+      "mode": "off",
+      "false_positives": [
+        "price_drift"
+      ],
+      "decision": "awaiting_approval",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Line 1 (Machine Maintenance Service) is billed at \u20b97813.05 against PO-2026-0025 price of \u20b97441.00, an increase of about 5.0%.",
+          "evidence": {
+            "invoice_unit_price": "7813.05",
+            "po_unit_price": "7441.00",
+            "drift_pct": "5.00"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Vendor Maa Durga Packaging Udyog (V002) is active and the invoice total is \u20b916,528.59, within the \u20b950,000 auto-approve limit. Line 1 is billed about 5.0% above the PO price of \u20b97,441.00 (invoiced at \u20b97,813.05), which needs a human check, though the increase is at the threshold rather than clearly over it. No duplicate invoice was found in the posted ledger."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 2,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": "auditor disagrees with the rules: warning price_drift",
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at 7813.05 against a PO price of 7441.00, an increase of exactly 5.00%. This is at the drift threshold, not above it, so no action is required.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against open PO-2026-0025, and the total is within the \u20b950,000 auto-approve limit. The machine maintenance line is exactly 5.00% above the PO price, which is at the threshold and needs no action. All other checks passed, and no duplicate was found in posted invoices."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 2,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Line 1 (Machine Maintenance Service) is invoiced at \u20b97,813.05 against a PO price of \u20b97,441.00, a 5.0% increase. This is exactly at the threshold, not above it.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against open PO-2026-0025, which is within the auto-approve limit. The only observation is that the maintenance service line is exactly 5.0% above its PO price, which is informational and not above the threshold. No duplicate, GST, date, or vendor-status issues were found."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 0,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (active vendor V007) invoice DBL-2026-0273 for \u20b91,18,448.10 matches PO-2026-0017 line for line, with no price drift and no duplicate in the ledger. The total is above the \u20b950,000 auto-approve limit, so it needs human approval before payment."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 0,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (active vendor V007) invoice DBL-2026-0273 for \u20b91,18,448.10 matches PO-2026-0017 in quantities, unit prices, HSN codes and GST rates, with no duplicate found in posted invoices. The total exceeds the \u20b950,000 auto-approve limit, so it needs approval, though no problems were found. The deterministic checks reported no issues."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 0,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (vendor V007, active) has invoice DBL-2026-0273 for \u20b9118,448.10 against open PO-2026-0017. All lines match the PO quantities and unit prices, and no duplicate exists in the posted invoices. The total exceeds the \u20b950,000 auto-approve limit, so it needs human approval even though no checks raised a problem."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 1,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (V007, active) invoice DBL-2026-0273 for \u20b91,18,448.10 is matched to open PO-2026-0017, with unit prices identical to the PO and no duplicate in the ledger. The total is above the \u20b950,000 auto-approve limit, so it needs a human approver to sign off before payment."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 1,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Invoice DBL-2026-0273 from Deccan Bearings Ltd (vendor V007, active) against open PO-2026-0017 totals \u20b9118,448.10. All lines match the PO on quantity, HSN code, and unit price, and no duplicate of this invoice exists in the ledger. The total is above the \u20b950,000 auto-approve limit, so it needs human approval before payment."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 1,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (vendor V007, active) has invoiced DBL-2026-0273 for \u20b91,18,448.10 against open PO-2026-0017, and the PO prices match the invoice exactly. No duplicate of this invoice exists in the posted ledger. The total is above the \u20b950,000 auto-approve limit, so it needs human approval, though no issues were found."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 2,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Invoice DBL-2026-0273 from Deccan Bearings Ltd (active vendor V007) for \u20b91,18,448.10 is matched to open PO-2026-0017, with all lines agreeing on quantity, price and HSN/GST rate. No duplicate or other issue was found, but the total is above the \u20b950,000 auto-approve limit, so it needs human approval."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 2,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (vendor V007, active) has invoiced DBL-2026-0273 for \u20b9118,448.10 against open PO-2026-0017. Prices, quantities, HSN codes and tax treatment all match the PO and the ledger, and no duplicate exists. The total is above the \u20b950,000 auto-approve limit, so it needs human approval before payment."
+    },
+    {
+      "case": "inv-019",
+      "repeat": 2,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Deccan Bearings Ltd (vendor V007, active) submitted invoice DBL-2026-0273 dated 26 September 2026 for \u20b9118,448.10 against open PO-2026-0017. The deterministic checks raised nothing, and the ledger shows no posted invoice matching this number, so it does not appear to be a duplicate. The total is above the \u20b950,000 auto-approve limit, so it needs approver sign-off."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 0,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD 3,942.00, converted at the reference rate for 2026-09-08 to approximately \u20b93,31,128. This exceeds the \u20b950,000 auto-approve limit, so human approval is needed.",
+          "evidence": {
+            "usd_total": "3942.00",
+            "inr_equivalent": "331128.00",
+            "rate_date": "2026-09-08"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "The invoice PGW-2026-0114 from Pacific Gauge Works LLC (vendor V015, active) totals USD 3,942.00, or about \u20b93,31,128 at the 8 Sep 2026 reference rate, well above the \u20b950,000 auto-approve limit. There is no PO for this invoice, and the FX conversion should be confirmed before payment."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 0,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD 3,942.00, converted at the 8 Sep 2026 reference rate to approximately \u20b93,31,128. This exceeds the \u20b950,000 auto-approve limit, so human approval is required.",
+          "evidence": {
+            "usd_total": "3942.00",
+            "inr_equivalent": "331128.00",
+            "rate_date": "2026-09-08"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Pacific Gauge Works LLC (V015, active) invoiced USD 3,942.00 (\u2248 \u20b93,31,128 at the 8 Sep 2026 reference rate), well above the \u20b950,000 auto-approve limit. No PO is referenced on the invoice, so price drift could not be checked against agreed prices. No prior posting matches invoice PGW-2026-0114, and the vendor's recent invoices are different numbers."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 0,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Pacific Gauge Works LLC (vendor V015, active) invoiced USD 3,942.00, which converts to about \u20b93,31,128 at the 8 Sep 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, and the FX conversion still needs the human check flagged by the deterministic warning. No PO was quoted, so price drift could not be checked against a PO, and no posted invoice matches this number."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 1,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice total is USD 3,942.00, which converts to approximately \u20b93,31,128 at the 8 Sep 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, so it needs approval.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "narrative": "Invoice PGW-2026-0114 from Pacific Gauge Works LLC (active vendor V015, a US supplier) is for USD 3,942.00, approximately \u20b93,31,128 at the invoice-date reference rate. No PO was referenced, and no duplicate was found in posted invoices. The amount is well above the \u20b950,000 auto-approve limit, so it needs human approval, and the FX conversion should be verified before payment."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 1,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "USD 3942.00 converts to approximately \u20b93,31,128 at the 8 Sep 2026 reference rate, which is well above the \u20b950,000 auto-approve limit. The FX rate should be verified before approval.",
+          "evidence": {
+            "inr_amount": "331128.00",
+            "rate_date": "2026-09-08"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Pacific Gauge Works LLC (V015, active) is a foreign vendor with no GSTIN, and the invoice PGW-2026-0114 for USD 3942.00 converts to about \u20b93,31,128, well above the \u20b950,000 auto-approve limit. The invoice has no PO, so prices could not be checked against agreed rates, and no duplicate was found among posted invoices. The invoice carries no GST, which is consistent with a foreign supplier."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 1,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Pacific Gauge Works LLC (V015, active) invoiced USD 3,942.00 for a surface roughness tester and a digital caliper, which converts to about \u20b93,31,128 at the 8 September 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, and the deterministic FX check is still open. The invoice has no PO, so unit prices could not be checked against agreed rates, and no duplicate or vendor-status issue was found."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 2,
+      "mode": "off",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD 3,942.00; converted at the 8 Sep 2026 reference rate to approximately \u20b93,31,128, which is well above the \u20b950,000 auto-approve limit.",
+          "evidence": {
+            "amount_usd": "3942.00",
+            "inr_equivalent": "331128.00",
+            "on_date": "2026-09-08"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Pacific Gauge Works LLC (V015, active) invoice PGW-2026-0114 for USD 3,942.00, about \u20b93,31,128 at the 8 Sep 2026 reference rate, which is well above the \u20b950,000 auto-approve limit. The invoice has no PO, so the unit prices could not be checked against agreed rates. The currency conversion is an FX-unverified warning that a human should confirm against the actual payment rate."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 2,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD (3942.00). Converted at the reference rate for 2026-09-08 to approximately \u20b93,31,128.00, which is well above the \u20b950,000 auto-approve limit. The FX rate should be verified before payment.",
+          "evidence": {
+            "inr_amount": "331128.00",
+            "rate_date": "2026-09-08"
+          },
+          "source": "llm"
+        }
+      ],
+      "narrative": "Invoice PGW-2026-0114 from Pacific Gauge Works LLC (vendor V015, active) is for USD 3,942.00, about \u20b93,31,128.00 at the reference rate for 8 Sep 2026. That is far above the \u20b950,000 auto-approve limit, and the USD amount still needs an FX check. The invoice has no PO and no GSTIN, and it carries no tax, which is consistent with a foreign supplier."
+    },
+    {
+      "case": "inv-039",
+      "repeat": 2,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "awaiting_approval",
+      "expected": "awaiting_approval",
+      "escalation": null,
+      "llm_findings": [],
+      "narrative": "Pacific Gauge Works LLC (vendor V015, active) invoice PGW-2026-0114 for USD 3,942.00, which converts to about \u20b93,31,128 at the 8 Sep 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, so it needs human approval. No PO is attached, and no posted invoice matches this number."
+    }
+  ]
+}

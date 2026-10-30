@@ -1,0 +1,54 @@
+{
+ "dataset": "narrative",
+ "model": "anthropic:claude-haiku-5-5",
+ "time": "2026-10-30T10:21:05",
+ "cases": 10,
+ "metrics": {
+  "narrative_pass_rate": 0.8,
+  "four_sentences_rate": 1.0
+ },
+ "cost_usd": "0.007506320",
+ "per_case": {
+  "inv-001": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-017": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-020": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-022": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-024": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-028": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-029": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-030": {
+   "LLMJudge": true,
+   "AtMostFourSentences": true
+  },
+  "inv-033": {
+   "LLMJudge": false,
+   "AtMostFourSentences": true
+  },
+  "inv-038": {
+   "LLMJudge": false,
+   "AtMostFourSentences": true
+  }
+ },
+ "failures": {}
+}

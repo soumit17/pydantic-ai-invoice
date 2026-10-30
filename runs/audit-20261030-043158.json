@@ -1,0 +1,1535 @@
+{
+  "model": "anthropic:claude-haiku-5-5",
+  "cost_usd": "0.030152630",
+  "rows": [
+    {
+      "file_id": "inv-001",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor Shri Balaji Engineering Works (V001) is active and in the vendor master; GSTIN matches",
+        "PO-2026-0001 is open, belongs to this vendor, and all four invoice lines match PO quantities, unit prices and GST rates (no price drift)",
+        "No posted invoice matches INV/26/165; no duplicate found in vendor history (INV/26/164, INV/26/161, INV-26-167 are different invoices)",
+        "Invoice date 2026-09-30 is within the stale limit",
+        "Total \u20b929,150.00 is below the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice INV/26/165 from Shri Balaji Engineering Works (active vendor, V001) for \u20b929,150.00 is matched to open PO-2026-0001, with all lines agreeing to the PO prices and no duplicate in the ledger. No additional issues were found beyond the deterministic checks, which reported none. The total is within the auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13242,
+      "output_tokens": 738,
+      "cache_read_tokens": 10818,
+      "seconds": 5.9
+    },
+    {
+      "file_id": "inv-002",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V002 (Maa Durga Packaging Udyog) is in the vendor master and active; GSTIN matches.",
+        "PO-2026-0002 is open, belongs to this vendor, and all 8 invoice lines match PO quantities, unit prices and GST rates, so no price drift.",
+        "No posted invoice matches MDP/0257/26-27, so no duplicate found.",
+        "Invoice dated 2026-10-06 is recent, not stale.",
+        "GST split is intra-state (CGST/SGST, state code 19 on both sides), consistent with the supply.",
+        "Line-level tax and totals reconcile with the printed subtotal and total."
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice MDP/0257/26-27 from Maa Durga Packaging Udyog (active vendor V002) totals \u20b923,224.60 and matches PO-2026-0002 line for line on quantity, price and GST rate. No duplicate, price drift or GST issues were found. The amount is within the \u20b950,000 auto-approve limit, so it can be approved.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 9450,
+      "output_tokens": 608,
+      "cache_read_tokens": 6876,
+      "seconds": 3.85
+    },
+    {
+      "file_id": "inv-003",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the vendor master and active (V003, GSTIN matches)",
+        "PO-2026-0003 exists, is open, and belongs to this vendor",
+        "Unit prices match PO prices on all four lines (no price drift)",
+        "Quantities and HSN codes match the PO lines",
+        "GST rates match the PO on all lines",
+        "No duplicate of EFH-2026-0231 among posted invoices",
+        "Invoice date 2026-10-06 is within the stale limit",
+        "Total \u20b935,674.78 is within the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice EFH-2026-0231 from Eastern Fasteners & Hardware (vendor V003, active) for \u20b935,674.78 against PO-2026-0003 (open). All four line items match the PO quantities, unit prices and GST rates, and no earlier posted invoice matches this number. The total is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8161,
+      "output_tokens": 608,
+      "cache_read_tokens": 6345,
+      "seconds": 4.09
+    },
+    {
+      "file_id": "inv-004",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V004 (Bengal Lubricants Pvt Ltd) is active, GSTIN matches the vendor master",
+        "No duplicate: invoice number 286 not found among posted invoices, and vendor history shows only invoice 285 (2026-06-04)",
+        "Invoice dated 2026-09-21 is within the 180-day stale limit",
+        "Intra-state supply (both parties in West Bengal, state code 19): CGST/SGST split is correct on all lines, IGST is zero",
+        "Tax rates and per-line amounts are consistent with taxable values"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Bengal Lubricants Pvt Ltd (V004, active) has submitted invoice 286 dated 21 September 2026 for \u20b929,223.24 (taxable \u20b925,536.00 plus \u20b93,687.24 GST), which is within the \u20b950,000 auto-approve limit. No PO is referenced on the invoice, so no price-drift comparison was possible, and no duplicate or other issues were found. No findings were raised, so the suggested decision is approval.",
+      "trajectory": [
+        "get_vendor",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13008,
+      "output_tokens": 701,
+      "cache_read_tokens": 10980,
+      "seconds": 6.28
+    },
+    {
+      "file_id": "inv-005",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V005 (Howrah Industrial Services) is active, GSTIN matches the vendor master, and state code 19 matches the supplier GSTIN.",
+        "PO-2026-0004 is open, belongs to V005, and all six invoice lines match PO HSN codes, quantities, unit prices and GST rates exactly, so no price drift.",
+        "No duplicate: INV/26/074 is not among posted invoices, and the vendor's only recent posting is INV/26/073 (different invoice).",
+        "Invoice dated 2026-10-26 is within the 180-day staleness limit.",
+        "Intra-state supply (19 to 19) uses CGST/SGST with IGST at zero, which is correct.",
+        "Line-level tax amounts are consistent with the taxable values and GST rates."
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice INV/26/074 from Howrah Industrial Services (active vendor V005) totals \u20b928,870.60 and is matched to open PO-2026-0004. All lines agree with the PO prices, the GST treatment is correct for an intra-state supply, and no duplicate was found. There are no findings, and the amount is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 14095,
+      "output_tokens": 798,
+      "cache_read_tokens": 11532,
+      "seconds": 5.26
+    },
+    {
+      "file_id": "inv-006",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V006 is in the vendor master and active",
+        "PO-2026-0005 exists, is open, and belongs to this vendor",
+        "All six unit prices match PO prices (no price drift)",
+        "GST rates on every line match the PO",
+        "Invoice number SLS-2026-0165 not found among posted invoices (no duplicate)",
+        "Invoice dated 21 Oct 2026, within the 180-day staleness limit",
+        "Total \u20b914,344.40 is within the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice SLS-2026-0165 from Salt Lake Safety Supplies (vendor V006, active) for \u20b914,344.40 against open PO-2026-0005. All six line items match the PO on quantity, unit price and GST rate, and the invoice is within the \u20b950,000 auto-approve limit. No duplicate of this invoice number was found among posted invoices.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8803,
+      "output_tokens": 596,
+      "cache_read_tokens": 6604,
+      "seconds": 3.94
+    },
+    {
+      "file_id": "inv-007",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor Shri Balaji Engineering Works (V001) is active in the vendor master with matching GSTIN",
+        "PO-2026-0006 is open, belongs to this vendor, and all 8 unit prices match the PO exactly (no price drift)",
+        "No duplicate of INV/26/166 found among posted invoices (vendor history shows INV/26/164, INV/26/161, INV-26-167 only)",
+        "Invoice date 2026-10-08 is within the 180-day stale limit",
+        "Intra-state supply (both GSTINs state code 19) and all lines use CGST+SGST with IGST at zero, consistent with the rule",
+        "Line-level taxable values, GST amounts and total \u20b928,753.92 are consistent with the printed figures"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Shri Balaji Engineering Works (active, V001) invoice INV/26/166 for \u20b928,753.92 matches open PO-2026-0006 at every agreed unit price and is not a duplicate of any posted invoice. The total is within the \u20b950,000 auto-approve limit and no problems were found by the ledger checks or on review. Suggested decision: approve.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 15298,
+      "output_tokens": 743,
+      "cache_read_tokens": 12122,
+      "seconds": 7.37
+    },
+    {
+      "file_id": "inv-008",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the vendor master and active (V002)",
+        "No duplicate found among posted invoices (searched by invoice number and vendor history)",
+        "Invoice date is within the stale limit",
+        "Total is within the auto-approve limit (\u20b928,465.04 < \u20b950,000)",
+        "Vendor bank details on file match the vendor master record",
+        "No PO referenced, so no price-drift comparison applicable"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Maa Durga Packaging Udyog (vendor V002, active) submitted invoice MDP/0258/26-27 dated 3 October 2026 for a total of \u20b928,465.04, with no PO reference. The invoice number does not match any posted invoice, and the vendor's recent posted invoices (MDP/0253 and MDP/0256) are different documents. The total is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13185,
+      "output_tokens": 638,
+      "cache_read_tokens": 10992,
+      "seconds": 6.84
+    },
+    {
+      "file_id": "inv-009",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the master and active (V003, state code 19 matches the GSTIN)",
+        "PO-2026-0007 exists, is open, and belongs to this vendor",
+        "All 8 line unit prices match PO prices (no price drift)",
+        "GST rates match the PO lines and the CGST/SGST split is correct for an intra-state supply",
+        "No duplicate of EFH-2026-0232 among posted invoices",
+        "Invoice dated 2026-09-30 is within the stale limit",
+        "Total \u20b930,279.56 is within the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice EFH-2026-0232 from Eastern Fasteners & Hardware (vendor V003, active) for \u20b930,279.56 is matched to open PO-2026-0007. All eight line items agree with the PO on unit price and GST rate, and no duplicate was found among posted invoices. The total is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 9416,
+      "output_tokens": 578,
+      "cache_read_tokens": 6864,
+      "seconds": 4.58
+    },
+    {
+      "file_id": "inv-010",
+      "category": "clean_intra",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the master and active (V004, state code 19 matches the GSTIN)",
+        "PO-2026-0008 exists, is open, and belongs to this vendor",
+        "All six line items match PO unit prices (no price drift)",
+        "All line quantities and GST rates match the PO",
+        "No duplicate found among posted invoices for number 287",
+        "Intra-state supply (West Bengal to West Bengal) correctly charged CGST+SGST with no IGST",
+        "Invoice dated 2026-09-14, well within the 180-day stale limit",
+        "Total is within the auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice 287 from Bengal Lubricants Pvt Ltd (active vendor V004) for \u20b930,536.26 is within the \u20b950,000 auto-approve limit. All six line items match PO-2026-0008 (open) on quantity, unit price and GST rate, and no posted invoice matches this number. No critical or warning findings were raised.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8730,
+      "output_tokens": 569,
+      "cache_read_tokens": 6591,
+      "seconds": 4.2
+    },
+    {
+      "file_id": "inv-011",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V007 is in the vendor master and active (status and bank details on file)",
+        "All six unit prices match PO-2026-0009 exactly, so no price drift",
+        "PO-2026-0009 is open and issued by the same vendor (V007)",
+        "No posted invoice matches DBL-2026-0271, so no duplicate",
+        "Invoice date 2026-09-20 is within the 180-day stale limit",
+        "Invoice total \u20b931,467.03 is within the \u20b950,000 auto-approve limit",
+        "All lines are IGST, consistent with an inter-state supply (Maharashtra to West Bengal)",
+        "HSN/SAC codes and GST rates match the PO lines"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice DBL-2026-0271 from Deccan Bearings Ltd (vendor V007, active) for \u20b931,467.03, against open PO-2026-0009. Every line's unit price matches the PO exactly, and no prior posted invoice matches this number, so it is not a duplicate. The total is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8710,
+      "output_tokens": 611,
+      "cache_read_tokens": 6581,
+      "seconds": 3.74
+    },
+    {
+      "file_id": "inv-012",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V008 (Karnataka Motors & Controls) is in the vendor master and active",
+        "PO-2026-0010 is open, issued 2026-10-17 and belongs to this vendor",
+        "All 8 line unit prices match the PO prices exactly, so no price drift",
+        "GST rates on each line match the PO rates",
+        "No posted invoice matches KMC/0137/26-27, so no duplicate",
+        "Invoice dated 2026-10-22 is recent, not stale",
+        "Invoice is INR, so no FX check needed",
+        "Supplier GSTIN state code 29 (Karnataka) with IGST on all lines is consistent with an inter-state supply to West Bengal (buyer state 19)"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice KMC/0137/26-27 from Karnataka Motors & Controls (active vendor V008, PO-2026-0010) totals \u20b932,699.64, which is within the \u20b950,000 auto-approve limit. The invoice matches its PO on unit prices, GST rates and vendor, and no duplicate exists in posted invoices. No issues were found by the deterministic checks or in my review.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 9406,
+      "output_tokens": 636,
+      "cache_read_tokens": 6857,
+      "seconds": 4.09
+    },
+    {
+      "file_id": "inv-013",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V009 is in the vendor master and active",
+        "All four line prices match PO-2026-0011 exactly (no price drift)",
+        "Line quantities and HSN codes match the PO",
+        "No duplicate of invoice 69 among posted invoices for V009",
+        "Invoice date is within the 180-day stale limit",
+        "Total \u20b918,897.86 is within the \u20b950,000 auto-approve limit",
+        "Vendor bank account and state code consistent with the supplier GSTIN"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Capital Tools Corporation (V009, active) invoice no. 69 dated 12 Oct 2026 for \u20b918,897.86, matched to open PO-2026-0011. No duplicate found among the vendor's posted invoices (nearest are nos. 65, 68 and 70), and the invoice is well within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13098,
+      "output_tokens": 653,
+      "cache_read_tokens": 10685,
+      "seconds": 6.19
+    },
+    {
+      "file_id": "inv-014",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the master and active (V010, state code 33 matches the GSTIN)",
+        "PO-2026-0012 exists, is open, and belongs to this vendor",
+        "All three unit prices match the PO exactly, so no price drift",
+        "Quantities match the PO lines",
+        "No posted invoice matches INV/26/249 in any format, so no duplicate",
+        "IGST only, consistent with an inter-state supply (Tamil Nadu to West Bengal)",
+        "Line-level tax and subtotal arithmetic is consistent (12200+7482+9456 = 29138; 18% tax = 5244.84)",
+        "Invoice date 2026-09-15 is within the 180-day stale limit",
+        "Total \u20b934,382.84 is below the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice INV/26/249 from Coromandel Logistics (active vendor V010) for \u20b934,382.84 against PO-2026-0012. The invoice lines match the PO quantities and unit prices exactly, and the tax is IGST on an inter-state supply, which is correct. The total is within the \u20b950,000 auto-approve limit.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 7863,
+      "output_tokens": 667,
+      "cache_read_tokens": 6226,
+      "seconds": 4.32
+    },
+    {
+      "file_id": "inv-015",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor Sabarmati Polymers (V011) is active in the vendor master, and its GSTIN matches the invoice",
+        "PO-2026-0013 is open, belongs to this vendor, and all six invoice lines match PO quantities, unit prices and GST rates; no price drift",
+        "No duplicate: invoice SP-2026-0092 not found among posted invoices, and the vendor's recent postings (SP-2026-0085, SP-2026-0088) are different invoices",
+        "Invoice dated 2026-09-19 is within the stale limit",
+        "Supplier state code 24 (Gujarat) versus buyer 19 (West Bengal) is inter-state, and all lines correctly use IGST with no CGST/SGST",
+        "Line-item and subtotal figures are consistent with the printed totals"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Sabarmati Polymers (active, vendor V011) invoice SP-2026-0092 for \u20b920,411.28 matches open PO-2026-0013 line for line at the agreed prices, with no duplicate found among posted invoices. The tax treatment is correct for an inter-state supply (IGST only). The total is within the \u20b950,000 auto-approve limit and no findings were raised, so the invoice can be approved.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 14235,
+      "output_tokens": 821,
+      "cache_read_tokens": 11519,
+      "seconds": 5.61
+    },
+    {
+      "file_id": "inv-016",
+      "category": "clean_inter",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V007 (Deccan Bearings Ltd) is active and matches the GSTIN on the invoice",
+        "PO-2026-0014 is open, belongs to V007, and all 8 invoice lines match PO quantities, unit prices and GST rates",
+        "No prior posting of invoice DBL-2026-0272 found (no duplicate); the only recent invoice from this vendor is DBL-2026-0267 dated 2026-06-05, a different number",
+        "Invoice date 2026-09-21 is within the 180-day stale limit and not in the future",
+        "Currency is INR, so no FX conversion needed",
+        "Supplier state (27, Maharashtra) and buyer state (19, West Bengal) are inter-state and all lines carry IGST only, which is correct"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Deccan Bearings Ltd (vendor V007, active) invoice DBL-2026-0272 for \u20b921,494.53 is matched to open PO-2026-0014, with all eight lines agreeing with the agreed PO prices and GST rates. No duplicate of this invoice exists in the posted ledger. The total is within the \u20b950,000 auto-approve limit and no findings were raised.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 15008,
+      "output_tokens": 801,
+      "cache_read_tokens": 12104,
+      "seconds": 5.41
+    },
+    {
+      "file_id": "inv-017",
+      "category": "clean_high_value",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V004 (Bengal Lubricants Pvt Ltd) is active and matches the GSTIN on the invoice",
+        "PO-2026-0015 is open, belongs to V004, and all three invoice lines match PO quantities, unit prices and GST rates (no price drift)",
+        "Invoice number 288 posted for V014 is a different vendor, USD-denominated and dated 2026-07-21, so it is not a duplicate of this invoice",
+        "Vendor history for V004 shows no duplicate invoice numbers in the last 6 months",
+        "Invoice dated 2026-10-05 is within the 180-day stale limit",
+        "Supplier state code 19 and buyer GSTIN 19 are both West Bengal, consistent with the CGST/SGST split used"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Bengal Lubricants Pvt Ltd (V004, active) has invoiced \u20b92,39,538.72 against open PO-2026-0015, and all line items match the PO prices and quantities. The total exceeds the \u20b950,000 auto-approve limit, so it needs approver sign-off, though no issues were found. Invoice number 288 appears in the ledger only under a different vendor (V014, USD), so it is not treated as a duplicate.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 12459,
+      "output_tokens": 731,
+      "cache_read_tokens": 10515,
+      "seconds": 6.53
+    },
+    {
+      "file_id": "inv-018",
+      "category": "clean_high_value",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor is in the vendor master and active (V008)",
+        "Vendor bank account and status verified",
+        "PO-2026-0016 exists, is open, and belongs to this vendor",
+        "Unit prices match PO prices on all 3 lines (no price drift)",
+        "HSN codes and GST rates match PO lines",
+        "No duplicate found in posted invoices",
+        "Invoice date 2026-09-21 is within the stale limit",
+        "Intra-GST type consistent: IGST used for inter-state supply (Karnataka to West Bengal)",
+        "Line taxable values and tax amounts are arithmetically consistent"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Invoice KMC/0138/26-27 from Karnataka Motors & Controls (vendor V008, active) totals \u20b9136,609.20, which is above the \u20b950,000 auto-approve limit. It is matched to open PO-2026-0016, and all three line prices equal the PO prices with no drift. No duplicate of this invoice number exists in posted invoices.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 7770,
+      "output_tokens": 593,
+      "cache_read_tokens": 6203,
+      "seconds": 4.77
+    },
+    {
+      "file_id": "inv-019",
+      "category": "clean_high_value",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V007 is in the vendor master, active, and the GSTIN matches",
+        "PO-2026-0017 is open and belongs to this vendor",
+        "All three unit prices match the PO exactly, so no price drift",
+        "IGST is correct: supplier state 27 and buyer state 19 are different, so this is inter-state",
+        "Line arithmetic, subtotal, total tax and grand total all reconcile to \u20b9118448.10",
+        "No duplicate: no posted invoice matches DBL-2026-0273, and the only vendor history entry (DBL-2026-0267, \u20b910087.32) is a different invoice",
+        "Invoice dated 2026-09-26 is within the 180-day limit and not future-dated"
+      ],
+      "escalation": "auditor disagrees with the rules: warning gst_type_mismatch",
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Deccan Bearings Ltd (V007) invoice DBL-2026-0273 for \u20b9118448.10 is against open PO-2026-0017, and all lines match the PO prices and quantities. The vendor is active, the tax is correctly IGST for an inter-state supply, and the arithmetic reconciles. The total is above the \u20b950000 auto-approve limit, so it needs approver sign-off, though nothing is wrong with it.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13194,
+      "output_tokens": 1113,
+      "cache_read_tokens": 11111,
+      "seconds": 15.91
+    },
+    {
+      "file_id": "inv-020",
+      "category": "exact_duplicate",
+      "currency": "INR",
+      "expected": [
+        "exact_duplicate"
+      ],
+      "flagged": [
+        "exact_duplicate"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V003 is active in the vendor master and the GSTIN matches",
+        "PO-2026-0018 is open, belongs to V003, and all 8 invoice lines match PO HSN codes, quantities, unit prices and GST rates (no price drift)",
+        "Invoice dated 2026-10-09 is within the stale limit",
+        "GST split is consistent with the intra-state supply (Kolkata to Kolkata, CGST/SGST, no IGST)",
+        "Invoice is in INR, so no FX verification is needed"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "Invoice EFH-2026-0233 from Eastern Fasteners & Hardware (V003, active) for \u20b923,439.90 is already posted as P-00032 with the same invoice number, date and total, so this is a duplicate payment risk and it must not be paid again. The vendor, PO-2026-0018 and the line prices all check out. Because of the critical duplicate finding, the suggested decision is hold.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 9774,
+      "output_tokens": 577,
+      "cache_read_tokens": 6976,
+      "seconds": 3.88
+    },
+    {
+      "file_id": "inv-021",
+      "category": "exact_duplicate",
+      "currency": "INR",
+      "expected": [
+        "exact_duplicate"
+      ],
+      "flagged": [
+        "exact_duplicate"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V009 (Capital Tools Corporation) is active and matches the GSTIN on the invoice",
+        "PO-2026-0019 is open, belongs to this vendor, and its line matches the invoice: HSN 8311, qty 43, unit price 658.00, GST 18%",
+        "No unit price drift: invoice price 658 equals PO price 658.00",
+        "Vendor history checked: invoice 70 is the only posting with this number (P-00031, same date and total), so this is the same invoice already posted"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "This invoice (No. 70, dated 1 Sep 2026, total \u20b933,386.92) from Capital Tools Corporation duplicates invoice 70 already posted as P-00031 with the same date and total, so it should not be paid again. The vendor is active and the PO and price checks pass, but the duplicate is critical and the invoice should be held.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 11886,
+      "output_tokens": 664,
+      "cache_read_tokens": 9936,
+      "seconds": 5.32
+    },
+    {
+      "file_id": "inv-022",
+      "category": "fuzzy_duplicate",
+      "currency": "INR",
+      "expected": [
+        "fuzzy_duplicate"
+      ],
+      "flagged": [
+        "fuzzy_duplicate"
+      ],
+      "llm_findings": [
+        {
+          "kind": "fuzzy_duplicate",
+          "severity": "critical",
+          "message": "Invoice INV/26/167 is a reformatted copy of INV-26-167, already posted as P-00033 with the same vendor, date (2026-10-12) and total (\u20b932,202.96). Payment would be a duplicate.",
+          "evidence": [
+            {
+              "name": "posting_id",
+              "value": "P-00033"
+            },
+            {
+              "name": "posted_invoice_no",
+              "value": "INV-26-167"
+            },
+            {
+              "name": "posted_total",
+              "value": "32202.96"
+            },
+            {
+              "name": "posted_vendor_id",
+              "value": "V001"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor V001 is active and matches the GSTIN and name in the vendor master",
+        "PO-2026-0020 exists, is open, and belongs to the same vendor V001",
+        "Unit prices match PO prices on all three lines (no price drift)",
+        "Invoice date 2026-10-12 is within the stale limit",
+        "GST type is consistent with the supply (CGST/SGST, intra-state West Bengal to West Bengal)",
+        "Line-level taxable values and tax amounts are consistent with the stated rates"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "Shri Balaji Engineering Works (V001, active) has submitted invoice INV/26/167 for \u20b932,202.96 against PO-2026-0020. The invoice matches an already-posted invoice, INV-26-167 (posting P-00033), with the same vendor, date and total, so paying it would be a duplicate payment. Hold it and confirm with the team that P-00033 is the original before any further action.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8136,
+      "output_tokens": 771,
+      "cache_read_tokens": 6324,
+      "seconds": 4.57
+    },
+    {
+      "file_id": "inv-023",
+      "category": "fuzzy_duplicate",
+      "currency": "INR",
+      "expected": [
+        "fuzzy_duplicate"
+      ],
+      "flagged": [
+        "fuzzy_duplicate"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V010 (Coromandel Logistics) is active and the GSTIN matches the vendor master",
+        "PO-2026-0021 is open, belongs to this vendor, and all three unit prices (56, 355, 3062) match the PO exactly, so no price drift",
+        "HSN codes and GST rates (12%, 12%, 18%) match the PO lines",
+        "Supplier state 33 (Tamil Nadu) and buyer state 19 (West Bengal) are inter-state, and IGST is correctly applied",
+        "Invoice date 2026-10-12 is within the stale limit",
+        "Duplicate search: the only match is P-00034 (INV-26-250), already reported by the deterministic duplicate check; no other postings found"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "This invoice from Coromandel Logistics (V010, active) for \u20b910,972.68 appears to be a duplicate of posted invoice P-00034 (INV-26-250), which has the same date and total, so it should not be paid again. Apart from that, the vendor, PO-2026-0021 prices, HSN/GST rates and IGST treatment all check out. Recommend holding the invoice and confirming with the vendor whether this is a resubmission of the already-posted invoice.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8224,
+      "output_tokens": 692,
+      "cache_read_tokens": 6343,
+      "seconds": 4.08
+    },
+    {
+      "file_id": "inv-024",
+      "category": "price_drift",
+      "currency": "INR",
+      "expected": [
+        "price_drift"
+      ],
+      "flagged": [
+        "price_drift"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V005 (Howrah Industrial Services) is active and the GSTIN matches the vendor master",
+        "PO-2026-0022 is open, belongs to V005, and the PO lines match the invoice items, HSN codes and GST rates",
+        "Unit prices for Corrugated Box, Hydraulic Oil, M8 Hex Bolt and Ball Bearing match the PO exactly",
+        "No duplicate found: INV/26/075 does not appear among posted invoices, and the vendor's last posted invoice is INV/26/073 (2026-06-24)",
+        "Invoice dated 2026-09-29 is within the 180-day staleness limit",
+        "GST split is consistent with the supplier and buyer both being in West Bengal (CGST/SGST, no IGST)"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Invoice INV/26/075 from Howrah Industrial Services (active vendor V005) totals \u20b924,950.76, which is under the \u20b950,000 auto-approve limit. The only issue is a price drift warning: Machine Maintenance Service is billed at \u20b97,804.08 against the PO price of \u20b97,226.00, which is +8.00% and above the 5.0% threshold. The approver should confirm whether the extra charge was agreed before paying; no duplicate or other problems were found.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13914,
+      "output_tokens": 796,
+      "cache_read_tokens": 11453,
+      "seconds": 5.46
+    },
+    {
+      "file_id": "inv-025",
+      "category": "price_drift",
+      "currency": "INR",
+      "expected": [
+        "price_drift"
+      ],
+      "flagged": [
+        "price_drift"
+      ],
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Corrugated Box 5-ply is invoiced at \u20b970.56 against PO-2026-0023 price of \u20b963.00, a 12% increase above the 5% threshold.",
+          "evidence": [
+            {
+              "name": "po_unit_price",
+              "value": "63.00"
+            },
+            {
+              "name": "invoice_unit_price",
+              "value": "70.56"
+            },
+            {
+              "name": "drift_pct",
+              "value": "+12.00%"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor V007 (Deccan Bearings Ltd) is active in the vendor master, GSTIN matches",
+        "PO-2026-0023 found, open, and issued to the same vendor",
+        "M8 Hex Bolt and Rice Bran unit prices match the PO exactly",
+        "No duplicate found among posted invoices for DBL-2026-0274",
+        "Invoice dated 2026-10-15, within the stale limit",
+        "GST type is consistent: inter-state supply (Maharashtra to West Bengal) uses IGST only",
+        "Line and invoice totals reconcile (subtotal 26545.76, tax 2427.09, total 28972.85)"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Deccan Bearings Ltd (active vendor V007) invoice DBL-2026-0274 for \u20b928,972.85 is against open PO-2026-0023, and no duplicate exists in the posted invoices. The corrugated box line is priced \u20b970.56 against the PO's \u20b963.00 (+12%), which a human should confirm before payment. The total is within the \u20b950,000 auto-approve limit, so the price drift is the only reason for review.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8075,
+      "output_tokens": 798,
+      "cache_read_tokens": 6351,
+      "seconds": 5.24
+    },
+    {
+      "file_id": "inv-026",
+      "category": "price_drift",
+      "currency": "INR",
+      "expected": [
+        "price_drift"
+      ],
+      "flagged": [
+        "price_drift"
+      ],
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Ball Bearing 6204-2RS is invoiced at \u20b9198.09 against the PO price of \u20b9186.00, a 6.50% increase above the 5.0% threshold.",
+          "evidence": [
+            {
+              "name": "po_number",
+              "value": "PO-2026-0024"
+            },
+            {
+              "name": "invoice_unit_price",
+              "value": "198.09"
+            },
+            {
+              "name": "po_unit_price",
+              "value": "186.00"
+            },
+            {
+              "name": "drift_pct",
+              "value": "+6.50%"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor SLS (V006) is in the vendor master, active, and the GSTIN matches the PO vendor",
+        "PO-2026-0024 is open and its lines match on HSN, description, quantity, and GST rate",
+        "Gloves unit price \u20b975.00 matches the PO exactly",
+        "No duplicate found among posted invoices for SLS-2026-0166",
+        "Invoice dated 2026-10-18 is within the stale limit",
+        "Intra-state supply (state code 19 on both sides) correctly uses CGST/SGST with no IGST",
+        "Line and total arithmetic checks out (subtotal \u20b915,452.76, tax \u20b92,615.00, total \u20b918,067.76)"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Salt Lake Safety Supplies (V006, active) has invoiced \u20b918,067.76 under PO-2026-0024, which is within the auto-approve limit. The ball bearing line is priced 6.50% above the PO rate (\u20b9198.09 vs \u20b9186.00), which is a warning that a human should check whether the price increase was agreed. All other checks passed, and no duplicate was found.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 7789,
+      "output_tokens": 850,
+      "cache_read_tokens": 6224,
+      "seconds": 4.66
+    },
+    {
+      "file_id": "inv-027",
+      "category": "price_drift_borderline",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at \u20b97,813.05 against a PO price of \u20b97,441.00, exactly 5.0% above, which is at the threshold and not above it.",
+          "evidence": [
+            {
+              "name": "invoice_unit_price",
+              "value": "7813.05"
+            },
+            {
+              "name": "po_unit_price",
+              "value": "7441.00"
+            },
+            {
+              "name": "drift_percent",
+              "value": "5.00"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor Maa Durga Packaging Udyog (V002) is active and its GSTIN matches the invoice",
+        "No posted invoice matches MDP/0259/26-27, so no duplicate",
+        "PO-2026-0025 is open, issued before the invoice, and matches the vendor",
+        "Rice Bran and Cotton Waste unit prices match the PO exactly",
+        "Intra-state supply (state code 19 on both sides) with CGST/SGST correctly applied",
+        "Line arithmetic, subtotal, tax and total reconcile to the printed figures",
+        "Invoice dated 2026-09-26 is within the 180-day stale limit",
+        "Total \u20b916,528.59 is within the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": "auditor disagrees with the rules: warning price_drift",
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Maa Durga Packaging Udyog (active vendor, PO-2026-0025) has invoiced \u20b916,528.59 in total, within the auto-approve limit. The only observation is that the maintenance service line is billed exactly 5.0% above the PO price, which is at the threshold and needs no action. No duplicates, GST or arithmetic issues were found.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8430,
+      "output_tokens": 1415,
+      "cache_read_tokens": 7582,
+      "seconds": 14.46
+    },
+    {
+      "file_id": "inv-028",
+      "category": "blocked_vendor",
+      "currency": "INR",
+      "expected": [
+        "blocked_vendor"
+      ],
+      "flagged": [
+        "blocked_vendor"
+      ],
+      "llm_findings": [
+        {
+          "kind": "blocked_vendor",
+          "severity": "critical",
+          "message": "Vendor Western Weld Consumables (V012) is blocked in the vendor master. Payment must not be released until the block is cleared.",
+          "evidence": [
+            {
+              "name": "vendor_id",
+              "value": "V012"
+            },
+            {
+              "name": "vendor_status",
+              "value": "blocked"
+            },
+            {
+              "name": "gstin",
+              "value": "27YIJSD8974U3ZO"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Duplicate check: no posted invoice matches WWC-2026-0073 and the vendor has no invoice history in the last 6 months",
+        "Invoice date 2026-10-24 is within the stale limit",
+        "GST: 0% rate with no tax lines, no IGST/CGST/SGST mismatch for an intra-state (27 to 19 is inter-state, but no tax is charged, so no mismatch)",
+        "Math: 669 kg x \u20b927 = \u20b918063.00 matches taxable value, subtotal and total",
+        "Vendor GSTIN state code 27 matches the GSTIN on the invoice"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "Invoice WWC-2026-0073 from Western Weld Consumables (V012) for \u20b918,063.00, which is within the auto-approve limit. The vendor is blocked in the vendor master, so this invoice must be held and not paid. No PO is referenced on the invoice, and no duplicate or prior history was found.",
+      "trajectory": [
+        "get_vendor",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 10879,
+      "output_tokens": 765,
+      "cache_read_tokens": 9683,
+      "seconds": 5.42
+    },
+    {
+      "file_id": "inv-029",
+      "category": "unknown_vendor",
+      "currency": "INR",
+      "expected": [
+        "unknown_vendor"
+      ],
+      "flagged": [
+        "unknown_vendor"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "No duplicate: no posted invoice matches INV/26/075",
+        "GST type correct: supplier in Madhya Pradesh (23) and buyer in West Bengal (19) are inter-state, and IGST 18% is charged",
+        "Math correct: 5884 \u00d7 18% = 1059.12; subtotal plus tax equals 6943.12",
+        "Date OK: 2026-10-02 is within the 180-day stale limit",
+        "Total \u20b96943.12 is within the \u20b950000 auto-approve limit"
+      ],
+      "escalation": "auditor disagrees with the rules: warning gst_type_mismatch",
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Narmada Steel Traders (GSTIN 23FUUNU2670C9ZY) is not in the vendor master, which the deterministic check already flags, so its status and KYC cannot be verified. The invoice has no PO, so there are no agreed prices to compare against. The total is \u20b96943.12, under the auto-approve limit, but the unknown vendor needs a human check before payment.",
+      "trajectory": [
+        "search_posted",
+        "get_vendor"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 7644,
+      "output_tokens": 625,
+      "cache_read_tokens": 6559,
+      "seconds": 9.92
+    },
+    {
+      "file_id": "inv-030",
+      "category": "gst_type_mismatch",
+      "currency": "INR",
+      "expected": [
+        "gst_type_mismatch"
+      ],
+      "flagged": [
+        "gst_type_mismatch"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V006 (Salt Lake Safety Supplies) is in the vendor master, active, state code 19 matches GSTIN prefix",
+        "All four line items match PO-2026-0026 unit prices exactly (18, 62, 1059, 3780), so no price drift",
+        "Quantities and HSN/SAC codes match the PO lines and gst_rate values agree with the PO",
+        "No posted invoice matches SLS-2026-0167; no duplicate found",
+        "Invoice date 2026-09-18 is within the 180-day stale limit",
+        "Total \u20b912,511.32 is within the \u20b950,000 auto-approve limit"
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "Invoice SLS-2026-0167 from Salt Lake Safety Supplies (active vendor V006) totals \u20b912,511.32 and is against open PO-2026-0026, with all unit prices matching the PO. The deterministic check flagged a critical GST issue: IGST of \u20b91,219.32 was charged on an intra-state supply (both parties are in West Bengal, state 19), which should be CGST+SGST instead. Because of this critical finding, the invoice should be held until the supplier reissues it with the correct tax split.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 8271,
+      "output_tokens": 689,
+      "cache_read_tokens": 6405,
+      "seconds": 4.02
+    },
+    {
+      "file_id": "inv-031",
+      "category": "gst_type_mismatch",
+      "currency": "INR",
+      "expected": [
+        "gst_type_mismatch"
+      ],
+      "flagged": [
+        "gst_type_mismatch"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V004 (Bengal Lubricants Pvt Ltd) is active and matches the vendor master, with the GSTIN matching.",
+        "PO-2026-0027 is open, belongs to V004, and both invoice lines match PO quantities, unit prices (\u20b920 and \u20b9171) and HSN/GST rates, so there is no price drift.",
+        "No duplicate found: invoice 289 does not appear among posted invoices, and the vendor's only prior invoice is 285 (\u20b913,784.53, June 2026).",
+        "Invoice date 2026-09-03 is within the 180-day stale limit.",
+        "Line-item arithmetic checks out: 518 \u00d7 20 = 10,360; 42 \u00d7 171 = 7,182; subtotal 17,542; total tax 1,292.76; total 18,834.76."
+      ],
+      "escalation": null,
+      "decision": "held",
+      "expected_decision": "held",
+      "suggested": "hold",
+      "narrative": "Bengal Lubricants Pvt Ltd (V004, active) has invoiced \u20b918,834.76 against PO-2026-0027, which matches the PO prices and quantities and is not a duplicate. The deterministic check flagged a critical GST type mismatch: IGST of \u20b91,292.76 was charged on the ball bearings even though both supplier and buyer are in West Bengal (state 19), so it should be CGST+SGST (\u20b9646.38 each) and the invoice should be corrected or re-issued by the vendor before payment. The total is within the \u20b950,000 auto-approve limit, but the critical finding means the invoice should be held.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "vendor_history",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 12100,
+      "output_tokens": 849,
+      "cache_read_tokens": 10312,
+      "seconds": 5.68
+    },
+    {
+      "file_id": "inv-032",
+      "category": "math_error",
+      "currency": "INR",
+      "expected": [
+        "math_error"
+      ],
+      "flagged": [
+        "math_error"
+      ],
+      "llm_findings": [
+        {
+          "kind": "math_error",
+          "severity": "warning",
+          "message": "Line 2 taxable value (4608.00) does not match qty x unit price (42 x 99 = 4158.00). Overstated by 450.00 versus the PO-agreed rate; the printed GST on line 2 (115.20 CGST + 115.20 SGST) is computed on the 4608.00 figure, so the tax and total are also affected.",
+          "evidence": [
+            {
+              "name": "qty x unit_price",
+              "value": "42 x 99 = 4158.00"
+            },
+            {
+              "name": "printed taxable_value",
+              "value": "4608.00"
+            },
+            {
+              "name": "difference",
+              "value": "450.00"
+            },
+            {
+              "name": "PO-2026-0028 line 2 unit price",
+              "value": "99.00"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor V003 (Eastern Fasteners & Hardware) found in vendor master, status active",
+        "PO-2026-0028 found, open, issued 2026-09-01, same vendor",
+        "Unit prices on lines 1 and 3 match PO prices (60.00 and 699.00); no price drift",
+        "HSN codes and GST rates match PO lines",
+        "No duplicate found among posted invoices for EFH-2026-0234",
+        "Invoice dated 2026-09-10 is within the 180-day stale limit",
+        "Intra-state supply (state code 19 on both GSTINs) with CGST/SGST split is correct",
+        "Line 1 and line 3 tax arithmetic is consistent with taxable values"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Eastern Fasteners & Hardware (V003, active) invoice EFH-2026-0234 totals \u20b930,650.70 against open PO-2026-0028, and no duplicate was found. Line 2 (Cotton Waste) has a taxable value of \u20b94,608.00 but qty \u00d7 unit price gives \u20b94,158.00, so the supplier should confirm the correct amount before payment. The total is within the \u20b950,000 auto-approve limit, but the flagged line means the invoice needs approval.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 7999,
+      "output_tokens": 921,
+      "cache_read_tokens": 6314,
+      "seconds": 5.18
+    },
+    {
+      "file_id": "inv-033",
+      "category": "math_error",
+      "currency": "INR",
+      "expected": [
+        "math_error"
+      ],
+      "flagged": [
+        "math_error"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor Sabarmati Polymers (V011) is active in the vendor master, and the GSTIN matches the invoice.",
+        "All three line unit prices (127, 88, 28) match PO-2026-0029 exactly, so there is no price drift.",
+        "Quantities and HSN codes match the open PO.",
+        "No duplicate found: invoice SP-2026-0093 is not among posted invoices, and the vendor's recent invoices (SP-2026-0085, SP-2026-0088) are different.",
+        "GST treatment is consistent: IGST only on an inter-state supply (Gujarat to West Bengal), and rates match the PO.",
+        "Invoice date 2026-09-01 is within the 180-day stale limit."
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Sabarmati Polymers (active, V011) invoice SP-2026-0093 for \u20b922,706.16 matches open PO-2026-0029 on quantities, unit prices, and HSN codes, with no duplicate in the ledger. The deterministic check flagged a math error: the printed total of \u20b922,706.16 does not equal subtotal plus tax (\u20b921,188.00 + \u20b91,418.16 = \u20b922,606.16), a \u20b9100 difference that needs checking against the supplier's invoice before payment. The total is within the \u20b950,000 auto-approve limit, but the math discrepancy means a human should review it.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 12847,
+      "output_tokens": 867,
+      "cache_read_tokens": 10663,
+      "seconds": 5.82
+    },
+    {
+      "file_id": "inv-034",
+      "category": "scan_clean",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V002 (Maa Durga Packaging Udyog) is active in the vendor master, GSTIN matches, bank account on file",
+        "PO-2026-0030 is open, issued 2026-09-13 to the same vendor, and all 7 invoice lines match PO quantities, HSN codes, GST rates and unit prices (no price drift)",
+        "No posted invoice matches MDP/0260/26-27, so no duplicate found",
+        "Invoice dated 2026-09-22 is within the 180-day stale limit and not future-dated",
+        "Intra-state supply (both GSTINs state code 19): CGST/SGST split is correct on all taxed lines, no IGST",
+        "Line-level tax amounts and the invoice total of \u20b929,912.34 are consistent with the printed figures"
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Invoice MDP/0260/26-27 from active vendor Maa Durga Packaging Udyog (V002) for \u20b929,912.34 against open PO-2026-0030. All lines match the PO price and GST rate, the tax type is correct for an intra-state supply, and no duplicate exists in posted invoices. The total is within the \u20b950,000 auto-approve limit and no issues were found.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 2,
+      "input_tokens": 9100,
+      "output_tokens": 661,
+      "cache_read_tokens": 6737,
+      "seconds": 4.87
+    },
+    {
+      "file_id": "inv-035",
+      "category": "scan_clean",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V009 (Capital Tools Corporation) is active and matches the GSTIN and name on the invoice.",
+        "All three line unit prices match PO-2026-0031 exactly (351, 1063, 55), so no price drift.",
+        "Invoice 71 is not among posted invoices; the vendor's recent history shows invoices 65, 68 and 70 only, so no duplicate.",
+        "Invoice dated 2026-10-03 is within the 180-day stale limit.",
+        "Supplier state code 07 (Delhi) and buyer in West Bengal are inter-state, and IGST is charged on all lines, consistent with that.",
+        "PO-2026-0031 is open and was issued to this vendor on 2026-09-14."
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Capital Tools Corporation (V009, active) invoice 71 dated 3 October 2026 for PO-2026-0031 totals \u20b931,190.22, which is within the \u20b950,000 auto-approve limit. All line prices match the PO, the invoice is not a duplicate of any posted invoice, and the inter-state IGST treatment is correct. No issues were found beyond the deterministic checks.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "search_posted"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 12559,
+      "output_tokens": 747,
+      "cache_read_tokens": 10349,
+      "seconds": 5.73
+    },
+    {
+      "file_id": "inv-036",
+      "category": "scan_price_drift",
+      "currency": "INR",
+      "expected": [
+        "price_drift"
+      ],
+      "flagged": [
+        "price_drift"
+      ],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V005 (Howrah Industrial Services) is active and the GSTIN matches the vendor master",
+        "PO-2026-0032 is open, belongs to V005, and the PO lines match the invoice items, quantities, and HSN codes",
+        "No duplicate: INV/26/076 is not among the posted invoices, and the vendor's only other posted invoice is INV/26/073",
+        "Invoice date 2026-09-19 is within the 180-day stale limit",
+        "GST type is consistent: CGST and SGST split on an intra-state supply (both parties in West Bengal, state code 19)",
+        "Unit prices match the PO for cotton waste, bolts, ball bearings, and welding electrodes"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Howrah Industrial Services (V005, active) has invoiced \u20b930,425.40 against PO-2026-0032, which is within the \u20b950,000 auto-approve limit. The only issue is the price drift already flagged on Machine Maintenance Service, which is billed at \u20b96,876.10 against a PO price of \u20b96,251.00 (+10.00%, above the 5.0% threshold); the human approver should confirm whether this increase was agreed. Because of that warning, the invoice needs approval rather than automatic payment.",
+      "trajectory": [
+        "get_vendor",
+        "get_po",
+        "search_posted",
+        "vendor_history",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 13855,
+      "output_tokens": 780,
+      "cache_read_tokens": 11418,
+      "seconds": 5.63
+    },
+    {
+      "file_id": "inv-037",
+      "category": "email_clean",
+      "currency": "INR",
+      "expected": [],
+      "flagged": [],
+      "llm_findings": [],
+      "checks_passed": [
+        "Vendor V005 (Howrah Industrial Services) is in the vendor master, active, and the state code 19 matches the GSTIN.",
+        "No duplicate: INV/26/077 is not among posted invoices, and the vendor's only recent invoice is INV/26/073.",
+        "No PO referenced, so price drift cannot be checked against a PO; no finding raised for this.",
+        "Invoice date 2026-09-15 is within the stale limit (44 days old).",
+        "Currency is INR, so no FX verification needed.",
+        "Intra-state supply (both GSTINs state code 19) uses CGST/SGST with IGST at zero, which is correct."
+      ],
+      "escalation": null,
+      "decision": "auto_approved",
+      "expected_decision": "auto_approved",
+      "suggested": "approve",
+      "narrative": "Howrah Industrial Services (V005, active) invoice INV/26/077 dated 15 Sep 2026 totals \u20b915,232.12, which is within the \u20b950,000 auto-approve limit. No PO is referenced, so prices could not be checked against one. No duplicate of this invoice was found in the posted ledger, and the deterministic checks raised no issues.",
+      "trajectory": [
+        "get_vendor",
+        "search_posted",
+        "vendor_history"
+      ],
+      "fx_loaded": false,
+      "requests": 3,
+      "input_tokens": 11935,
+      "output_tokens": 643,
+      "cache_read_tokens": 10306,
+      "seconds": 4.81
+    },
+    {
+      "file_id": "inv-038",
+      "category": "foreign_currency",
+      "currency": "USD",
+      "expected": [
+        "fx_unverified"
+      ],
+      "flagged": [
+        "fx_unverified"
+      ],
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice total is USD 5,023.00, which converts to \u20b94,21,932.00 at the 27 Sep 2026 reference rate. This is well above the \u20b950,000 auto-approve limit, so it needs human approval.",
+          "evidence": [
+            {
+              "name": "total_usd",
+              "value": "5023.00"
+            },
+            {
+              "name": "total_inr_reference",
+              "value": "421932.00"
+            },
+            {
+              "name": "auto_approve_limit_inr",
+              "value": "50000"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor V014 (Lakeside Metrology Inc) is in the vendor master and active",
+        "No duplicate: invoice no. 292 not found among posted invoices",
+        "Vendor history reviewed (invoices 291 and 288 are distinct, no matching numbers or amounts)",
+        "Line-item arithmetic consistent: 3 x 1447 = 4341.00, 2 x 341 = 682.00, subtotal 5023.00",
+        "No tax charged: foreign vendor with no GSTIN, and zero tax is consistent with an export/import of services or goods"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "The invoice is from Lakeside Metrology Inc (active vendor V014, a US supplier with no GSTIN) for USD 5,023.00, which converts to approximately \u20b94,21,932 at the 27 Sep 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, so it needs approval. No PO is attached to this invoice; this is noted for the approver, and no duplicate was found.",
+      "trajectory": [
+        "load_capability(fx)",
+        "get_vendor",
+        "convert_to_inr",
+        "vendor_history",
+        "search_posted"
+      ],
+      "fx_loaded": true,
+      "requests": 3,
+      "input_tokens": 12166,
+      "output_tokens": 930,
+      "cache_read_tokens": 9921,
+      "seconds": 5.87
+    },
+    {
+      "file_id": "inv-039",
+      "category": "foreign_currency",
+      "currency": "USD",
+      "expected": [
+        "fx_unverified"
+      ],
+      "flagged": [
+        "fx_unverified"
+      ],
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD 3,942.00; converted at the reference rate for 2026-09-08 it is approximately \u20b93,31,128, well above the \u20b950,000 auto-approve limit. The conversion should be verified against the bank/treasury rate before payment.",
+          "evidence": [
+            {
+              "name": "total_usd",
+              "value": "3942.00"
+            },
+            {
+              "name": "total_inr_reference",
+              "value": "331128.00"
+            },
+            {
+              "name": "auto_approve_limit_inr",
+              "value": "50000"
+            }
+          ]
+        }
+      ],
+      "checks_passed": [
+        "Vendor V015 (Pacific Gauge Works LLC) is in the vendor master and active",
+        "No duplicate: invoice number PGW-2026-0114 not found among posted invoices, and vendor history shows no matching invoice",
+        "Invoice date 2026-09-08 is within the stale limit",
+        "Line math: 3 x 1296 = 3888.00 and subtotal 3942.00 is consistent with the line totals",
+        "No GST charged; foreign vendor with no GSTIN, zero tax is consistent with an export supply"
+      ],
+      "escalation": null,
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Pacific Gauge Works LLC (active vendor V015, US-based, no GSTIN) invoice PGW-2026-0114 totals USD 3,942.00, which is approximately \u20b93,31,128 at the 8 Sep 2026 reference rate. That is well above the \u20b950,000 auto-approve limit, and the FX amount still needs verification against the treasury rate. No PO was referenced on the invoice, which is noted but not a finding.",
+      "trajectory": [
+        "load_capability(fx)",
+        "get_vendor",
+        "search_posted",
+        "convert_to_inr",
+        "vendor_history"
+      ],
+      "fx_loaded": true,
+      "requests": 3,
+      "input_tokens": 12476,
+      "output_tokens": 915,
+      "cache_read_tokens": 10038,
+      "seconds": 5.8
+    }
+  ]
+}

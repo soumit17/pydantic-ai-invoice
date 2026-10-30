@@ -1,0 +1,15 @@
+04:53:24 [    INFO] (dbos:_dbos.py:732) Initializing DBOS (v3.4.0)
+04:53:24 [    INFO] (dbos:_dbos.py:817) Executor ID: local
+04:53:24 [    INFO] (dbos:_dbos.py:818) Application version: invoiceiq-p1
+04:53:24 [    INFO] (dbos:_dbos.py:819) Application name: invoiceiq
+04:53:24 [    INFO] (dbos:_sys_db.py:769) Initializing DBOS system database with URL: sqlite:////home/soumit/workspace/agentic/p1_pydantic_ai_invoices/runs/crash-20261030-045304/data/runtime/dbos.sqlite (schema: dbos)
+04:53:24 [    INFO] (dbos:_sys_db.py:773) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.
+04:53:24 [    INFO] (dbos:_dbos.py:902) Recovering 3 workflows from application version invoiceiq-p1
+04:53:24 [    INFO] (dbos:_dbos.py:1054) DBOS launched!
+04:53:24 [    INFO] (dbos:_dbos.py:1062) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=invoiceiq
+04:53:24 [ WARNING] (dbos:_sys_db.py:1429) Workflow already exists in queue: _dbos_internal_queue, but the provided queue name is: None. The queue is not updated.
+04:53:24 [    INFO] (dbos:_queue.py:1005) Listening to 1 queues:
+04:53:24 [    INFO] (dbos:_queue.py:980) Queue: invoiceiq_invoices (worker_concurrency=4)
+RESULT [{"invoice_id": "inv-001", "status": "posted", "decision": "auto_approved", "posting_id": "P-ba07c21532061b94", "error": null}, {"invoice_id": "inv-002", "status": "posted", "decision": "auto_approved", "posting_id": "P-503feafded46c5c4", "error": null}, {"invoice_id": "inv-003", "status": "posted", "decision": "auto_approved", "posting_id": "P-1895f63de9e37e16", "error": null}, {"invoice_id": "inv-004", "status": "posted", "decision": "auto_approved", "posting_id": "P-7768770e6ac50478", "error": null}, {"invoice_id": "inv-005", "status": "posted", "decision": "auto_approved", "posting_id": "P-1f210410285fe016", "error": null}, {"invoice_id": "inv-006", "status": "posted", "decision": "auto_approved", "posting_id": "P-3952a0e7540170ae", "error": null}, {"invoice_id": "inv-007", "status": "posted", "decision": "auto_approved", "posting_id": "P-5185e5e392ab33ea", "error": null}, {"invoice_id": "inv-008", "status": "posted", "decision": "auto_approved", "posting_id": "P-645d2275f0793a6b", "error": null}, {"invoice_id": "inv-009", "status": "posted", "decision": "auto_approved", "posting_id": "P-f54c1559656eb7c6", "error": null}, {"invoice_id": "inv-010", "status": "posted", "decision": "auto_approved", "posting_id": "P-e025126f3daea038", "error": null}, {"invoice_id": "inv-011", "status": "posted", "decision": "auto_approved", "posting_id": "P-b22b1d7196f935e2", "error": null}, {"invoice_id": "inv-012", "status": "posted", "decision": "auto_approved", "posting_id": "P-97c6301f651a9078", "error": null}]
+04:53:27 [    INFO] (dbos:_queue.py:943) Stopping queue manager, joining all worker threads...
+04:53:28 [    INFO] (dbos:_dbos.py:605) DBOS successfully shut down

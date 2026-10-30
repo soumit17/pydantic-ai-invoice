@@ -1,0 +1,121 @@
+09:37:44 [    INFO] (dbos:_dbos.py:732) Initializing DBOS (v3.4.0)
+09:37:44 [    INFO] (dbos:_dbos.py:817) Executor ID: local
+09:37:44 [    INFO] (dbos:_dbos.py:818) Application version: invoiceiq-p1
+09:37:44 [    INFO] (dbos:_dbos.py:819) Application name: invoiceiq
+09:37:44 [    INFO] (dbos:_sys_db.py:769) Initializing DBOS system database with URL: sqlite:////home/soumit/workspace/agentic/p1_pydantic_ai_invoices/runs/crash-20261030-093638/data/runtime/dbos.sqlite (schema: dbos)
+09:37:44 [    INFO] (dbos:_sys_db.py:773) Using SQLite as a system database. The SQLite system database is for development and testing. PostgreSQL is recommended for production use.
+09:37:45 [    INFO] (dbos:_dbos.py:902) Recovering 5 workflows from application version invoiceiq-p1
+09:37:45 [    INFO] (dbos:_dbos.py:1054) DBOS launched!
+09:37:45 [    INFO] (dbos:_dbos.py:1062) To view and manage workflows, connect to DBOS Conductor at: https://console.dbos.dev/self-host?appname=invoiceiq
+09:37:45 [    INFO] (dbos:_queue.py:1005) Listening to 1 queues:
+09:37:45 [    INFO] (dbos:_queue.py:980) Queue: invoiceiq_invoices (worker_concurrency=4)
+09:37:45 [ WARNING] (dbos:_sys_db.py:1429) Workflow already exists in queue: _dbos_internal_queue, but the provided queue name is: None. The queue is not updated.
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: UPDATE main.workflow_status SET owner_xid=main.workflow_status.owner_xid WHERE main.workflow_status.workflow_uuid = ? RETURNING owner_xid]
+[parameters: ('crash-batch:inv-028',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 1.28s (attempt 1)
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: UPDATE main.workflow_status SET owner_xid=main.workflow_status.owner_xid WHERE main.workflow_status.workflow_uuid = ? RETURNING owner_xid]
+[parameters: ('crash-batch:inv-028',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 0.72s (attempt 1)
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: UPDATE main.workflow_status SET owner_xid=main.workflow_status.owner_xid WHERE main.workflow_status.workflow_uuid = ? RETURNING owner_xid]
+[parameters: ('crash-batch:inv-028',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 1.49s (attempt 1)
+09:38:54 [ WARNING] (dbos:_workflow_commands.py:119) Exception in background job delayed_workflows: (sqlite3.OperationalError) database is locked
+[SQL: UPDATE main.workflow_status SET status=?, deduplication_id=CASE WHEN (main.workflow_status.is_debounced = 1) THEN NULL ELSE main.workflow_status.deduplication_id END WHERE main.workflow_status.status = ? AND main.workflow_status.delay_until_epoch_ms <= ? AND (main.workflow_status.application_name IN (?) OR main.workflow_status.application_name IS NULL)]
+[parameters: ('ENQUEUED', 'DELAYED', 1793333304047, 'invoiceiq')]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+09:38:54 [ WARNING] (dbos:_scheduler.py:289) Exception polling schedules: Traceback (most recent call last):
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlite3.OperationalError: database is locked
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/dbos/_scheduler.py", line 285, in dynamic_scheduler_loop
+    schedules = dbos._sys_db.list_schedules(
+                ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 6305, in list_schedules
+    return self._list_schedules(
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 6389, in _list_schedules
+    return _do(c)
+           ^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/dbos/_sys_db.py", line 6366, in _do
+    rows = c.execute(query).fetchall()
+           ^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1463, in execute
+    return meth(
+           ^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/sql/elements.py", line 533, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1683, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1837, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1977, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 2347, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/base.py", line 1958, in _exec_single_context
+    self.dialect.do_execute(
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/sqlalchemy/engine/default.py", line 1192, in do_execute
+    cursor.execute(statement, parameters)
+sqlalchemy.exc.OperationalError: (sqlite3.OperationalError) database is locked
+[SQL: SELECT main.workflow_schedules.schedule_id, main.workflow_schedules.schedule_name, main.workflow_schedules.workflow_name, main.workflow_schedules.workflow_class_name, main.workflow_schedules.schedule, main.workflow_schedules.status, main.workflow_schedules.context, main.workflow_schedules.last_fired_at, main.workflow_schedules.automatic_backfill, main.workflow_schedules.cron_timezone, main.workflow_schedules.queue_name, main.workflow_schedules.application_name 
+FROM main.workflow_schedules 
+WHERE main.workflow_schedules.application_name IN (?) OR main.workflow_schedules.application_name IS NULL]
+[parameters: ('invoiceiq',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: SELECT main.workflow_status.status, coalesce(main.workflow_output.output, main.workflow_status.output) AS coalesce_1, coalesce(main.workflow_output.error, main.workflow_status.error) AS coalesce_2, main.workflow_status.serialization 
+FROM main.workflow_status LEFT OUTER JOIN main.workflow_output ON main.workflow_status.workflow_uuid = main.workflow_output.workflow_uuid 
+WHERE main.workflow_status.workflow_uuid = ?]
+[parameters: ('crash-batch',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 0.56s (attempt 1)
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: SELECT main.workflow_status.status, coalesce(main.workflow_output.output, main.workflow_status.output) AS coalesce_1, coalesce(main.workflow_output.error, main.workflow_status.error) AS coalesce_2, main.workflow_status.serialization 
+FROM main.workflow_status LEFT OUTER JOIN main.workflow_output ON main.workflow_status.workflow_uuid = main.workflow_output.workflow_uuid 
+WHERE main.workflow_status.workflow_uuid = ?]
+[parameters: ('crash-batch:inv-025',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 0.89s (attempt 1)
+09:38:54 [ WARNING] (dbos:_queue.py:715) Exception reloading queue invoiceiq_invoices from database: (sqlite3.OperationalError) database is locked
+[SQL: SELECT main.queues.queue_id, main.queues.name, main.queues.concurrency, main.queues.worker_concurrency, main.queues.rate_limit_max, main.queues.rate_limit_period_sec, main.queues.priority_enabled, main.queues.partition_queue, main.queues.partition_concurrency, main.queues.partition_worker_concurrency, main.queues.partition_rate_limit_max, main.queues.partition_rate_limit_period_sec, main.queues.polling_interval_sec, main.queues.created_at, main.queues.updated_at, main.queues.application_name 
+FROM main.queues 
+WHERE main.queues.name = ?]
+[parameters: ('invoiceiq_invoices',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+09:38:54 [ WARNING] (dbos:_queue.py:915) Exception listing queues: (sqlite3.OperationalError) database is locked
+[SQL: SELECT main.queues.queue_id, main.queues.name, main.queues.concurrency, main.queues.worker_concurrency, main.queues.rate_limit_max, main.queues.rate_limit_period_sec, main.queues.priority_enabled, main.queues.partition_queue, main.queues.partition_concurrency, main.queues.partition_worker_concurrency, main.queues.partition_rate_limit_max, main.queues.partition_rate_limit_period_sec, main.queues.polling_interval_sec, main.queues.created_at, main.queues.updated_at, main.queues.application_name 
+FROM main.queues 
+WHERE main.queues.application_name IN (?) OR main.queues.application_name IS NULL]
+[parameters: ('invoiceiq',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+09:38:54 [ WARNING] (dbos:_queue.py:848) Exception encountered in queue thread for _dbos_internal_queue: (sqlite3.OperationalError) database is locked
+[SQL: SELECT anon_1.version_id, anon_1.version_name, anon_1.version_timestamp, anon_1.created_at, anon_1.application_name 
+FROM (SELECT main.application_versions.version_id AS version_id, main.application_versions.version_name AS version_name, main.application_versions.version_timestamp AS version_timestamp, main.application_versions.created_at AS created_at, main.application_versions.application_name AS application_name 
+FROM main.application_versions 
+WHERE main.application_versions.application_name = ? ORDER BY main.application_versions.application_name, main.application_versions.version_timestamp DESC
+ LIMIT ? OFFSET ?) AS anon_1 UNION ALL SELECT anon_2.version_id, anon_2.version_name, anon_2.version_timestamp, anon_2.created_at, anon_2.application_name 
+FROM (SELECT main.application_versions.version_id AS version_id, main.application_versions.version_name AS version_name, main.application_versions.version_timestamp AS version_timestamp, main.application_versions.created_at AS created_at, main.application_versions.application_name AS application_name 
+FROM main.application_versions 
+WHERE main.application_versions.application_name IS NULL ORDER BY main.application_versions.application_name, main.application_versions.version_timestamp DESC
+ LIMIT ? OFFSET ?) AS anon_2 ORDER BY version_timestamp DESC
+ LIMIT ? OFFSET ?]
+[parameters: ('invoiceiq', 1, 0, 1, 0, 1, 0)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8)
+09:38:54 [ WARNING] (dbos:_sys_db.py:620) Database connection failed: (sqlite3.OperationalError) database is locked
+[SQL: UPDATE main.workflow_status SET owner_xid=main.workflow_status.owner_xid WHERE main.workflow_status.workflow_uuid = ? RETURNING owner_xid]
+[parameters: ('crash-batch:inv-027',)]
+(Background on this error at: https://sqlalche.me/e/21/e3q8). Retrying in 1.25s (attempt 1)
+RESULT [{"invoice_id": "inv-001", "status": "posted", "decision": "auto_approved", "posting_id": "P-ba07c21532061b94", "error": null}, {"invoice_id": "inv-002", "status": "posted", "decision": "auto_approved", "posting_id": "P-503feafded46c5c4", "error": null}, {"invoice_id": "inv-003", "status": "posted", "decision": "auto_approved", "posting_id": "P-1895f63de9e37e16", "error": null}, {"invoice_id": "inv-004", "status": "posted", "decision": "auto_approved", "posting_id": "P-7768770e6ac50478", "error": null}, {"invoice_id": "inv-005", "status": "posted", "decision": "auto_approved", "posting_id": "P-1f210410285fe016", "error": null}, {"invoice_id": "inv-006", "status": "posted", "decision": "auto_approved", "posting_id": "P-3952a0e7540170ae", "error": null}, {"invoice_id": "inv-007", "status": "posted", "decision": "auto_approved", "posting_id": "P-5185e5e392ab33ea", "error": null}, {"invoice_id": "inv-008", "status": "posted", "decision": "auto_approved", "posting_id": "P-645d2275f0793a6b", "error": null}, {"invoice_id": "inv-009", "status": "posted", "decision": "auto_approved", "posting_id": "P-f54c1559656eb7c6", "error": null}, {"invoice_id": "inv-010", "status": "posted", "decision": "auto_approved", "posting_id": "P-e025126f3daea038", "error": null}, {"invoice_id": "inv-011", "status": "posted", "decision": "auto_approved", "posting_id": "P-b22b1d7196f935e2", "error": null}, {"invoice_id": "inv-012", "status": "posted", "decision": "auto_approved", "posting_id": "P-97c6301f651a9078", "error": null}, {"invoice_id": "inv-013", "status": "posted", "decision": "auto_approved", "posting_id": "P-057ef0b88a97b03c", "error": null}, {"invoice_id": "inv-014", "status": "posted", "decision": "auto_approved", "posting_id": "P-c836b8180f186e6e", "error": null}, {"invoice_id": "inv-015", "status": "posted", "decision": "auto_approved", "posting_id": "P-63ce48f4c0811b0e", "error": null}, {"invoice_id": "inv-016", "status": "posted", "decision": "auto_approved", "posting_id": "P-caf5bcdbafd5cd41", "error": null}, {"invoice_id": "inv-017", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-018", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-019", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-020", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-021", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-022", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-023", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-024", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-025", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-026", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-027", "status": "posted", "decision": "auto_approved", "posting_id": "P-f1ec0536707f73ae", "error": null}, {"invoice_id": "inv-028", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-029", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-030", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-031", "status": "held", "decision": "held", "posting_id": null, "error": null}, {"invoice_id": "inv-032", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-033", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-034", "status": "posted", "decision": "auto_approved", "posting_id": "P-c68d4eb37ff19b2e", "error": null}, {"invoice_id": "inv-035", "status": "posted", "decision": "auto_approved", "posting_id": "P-72099c8418310858", "error": null}, {"invoice_id": "inv-036", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-037", "status": "posted", "decision": "auto_approved", "posting_id": "P-90e861a6327126ac", "error": null}, {"invoice_id": "inv-038", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-039", "status": "awaiting_approval", "decision": "awaiting_approval", "posting_id": null, "error": null}, {"invoice_id": "inv-040", "status": "rejected", "decision": "rejected", "posting_id": null, "error": null}]
+09:39:48 [    INFO] (dbos:_queue.py:943) Stopping queue manager, joining all worker threads...
+09:39:49 [    INFO] (dbos:_dbos.py:605) DBOS successfully shut down

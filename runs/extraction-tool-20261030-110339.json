@@ -1,0 +1,22 @@
+{
+  "model": "anthropic:claude-haiku-5-5",
+  "mode": "tool",
+  "cost_usd": "0.000697390",
+  "rows": [
+    {
+      "file_id": "inv-001",
+      "category": "clean_intra",
+      "kind_ok": true,
+      "correct": 46,
+      "total": 46,
+      "wrong": [],
+      "requests": 1,
+      "input_tokens": 4641,
+      "output_tokens": 866,
+      "cache_read_tokens": 2219,
+      "reasoning_tokens": 0,
+      "retry_reasons": [],
+      "seconds": 4.12
+    }
+  ]
+}

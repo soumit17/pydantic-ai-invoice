@@ -11,8 +11,10 @@ wheels/
 
 # InvoiceIQ
 .env
-runs/
+# runs-and-logs branch: run artifacts are committed on purpose (see WALKTHROUGH.md).
+# The crash tests' private copies of data/ are identical to data/, so they stay out.
+runs/crash-*/data/invoices/
+runs/crash-*/data/ground_truth/
 .coverage
 .pytest_cache/
 .ruff_cache/
-data/runtime/

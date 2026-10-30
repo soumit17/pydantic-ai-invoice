@@ -1,0 +1,261 @@
+{
+ "model": "anthropic:claude-haiku-5-5",
+ "time": "2026-10-30T11:02:39",
+ "invoices": 40,
+ "decisions_correct": 40,
+ "cost_total_usd": "0.069293715",
+ "cost_per_invoice_usd": "0.001732342875",
+ "cost_unattributed_usd": "0.0029094",
+ "cost_by_agent_usd": {
+  "amount_judge": "0.0025615",
+  "approval_reviewer": "0.0003479",
+  "auditor": "0.031135515",
+  "extractor": "0.028501185",
+  "poster": "0.006747615"
+ },
+ "latency_p50_s": 14.6,
+ "latency_p95_s": 20.15,
+ "latency_max_s": 22.35,
+ "rows": [
+  {
+   "invoice": "inv-001",
+   "seconds": 15.158756241995434,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-002",
+   "seconds": 16.081522036001843,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-003",
+   "seconds": 12.681038486000034,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-004",
+   "seconds": 14.673562841002422,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-005",
+   "seconds": 21.342849959997693,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-006",
+   "seconds": 13.489090973998827,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-007",
+   "seconds": 18.025402947998373,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-008",
+   "seconds": 16.230387278003036,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-009",
+   "seconds": 14.543526958994335,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-010",
+   "seconds": 13.654121346997272,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-011",
+   "seconds": 18.372517174997483,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-012",
+   "seconds": 14.658709559000272,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-013",
+   "seconds": 13.636655059999612,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-014",
+   "seconds": 19.1140587819973,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-015",
+   "seconds": 16.853124266999657,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-016",
+   "seconds": 17.865752448997227,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-017",
+   "seconds": 15.986329476996616,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-018",
+   "seconds": 14.252051186995232,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-019",
+   "seconds": 16.944113110002945,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-020",
+   "seconds": 11.054788688001281,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-021",
+   "seconds": 14.989703778002877,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-022",
+   "seconds": 12.857260409000446,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-023",
+   "seconds": 13.65130709100049,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-024",
+   "seconds": 12.487844484996458,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-025",
+   "seconds": 10.251361431997793,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-026",
+   "seconds": 11.019312825002999,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-027",
+   "seconds": 22.354256727994652,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-028",
+   "seconds": 9.009083223994821,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-029",
+   "seconds": 15.46560078499897,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-030",
+   "seconds": 9.948621960997116,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-031",
+   "seconds": 9.187063190001936,
+   "status": "held",
+   "correct": true
+  },
+  {
+   "invoice": "inv-032",
+   "seconds": 9.703084357999614,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-033",
+   "seconds": 10.427908145000401,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-034",
+   "seconds": 16.808247950000805,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-035",
+   "seconds": 18.02859373299725,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-036",
+   "seconds": 19.737786815996515,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-037",
+   "seconds": 14.332975516997976,
+   "status": "posted",
+   "correct": true
+  },
+  {
+   "invoice": "inv-038",
+   "seconds": 20.14690017799876,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-039",
+   "seconds": 11.406451490001928,
+   "status": "awaiting_approval",
+   "correct": true
+  },
+  {
+   "invoice": "inv-040",
+   "seconds": 1.7125921479964745,
+   "status": "rejected",
+   "correct": true
+  }
+ ]
+}

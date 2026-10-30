@@ -1,0 +1,18 @@
+{
+  "cached": {
+    "requests": 10,
+    "input": 47466,
+    "cache_read": 19971,
+    "cache_write": 2219,
+    "output": 11118,
+    "usd": "0.008563685"
+  },
+  "uncached": {
+    "requests": 10,
+    "input": 47466,
+    "cache_read": 0,
+    "cache_write": 0,
+    "output": 11118,
+    "usd": "0.0103056"
+  }
+}

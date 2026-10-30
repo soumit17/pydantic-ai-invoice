@@ -1,0 +1,20 @@
+Traceback (most recent call last):
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/scripts/crash_test.py", line 210, in <module>
+    asyncio.run(worker(a.root, a.n, a.fake))
+  File "/home/soumit/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 195, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/home/soumit/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/.local/share/uv/python/cpython-3.12.15-linux-x86_64-gnu/lib/python3.12/asyncio/base_events.py", line 691, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/scripts/crash_test.py", line 42, in worker
+    from invoiceiq.pipeline.batch import start_runtime, stop_runtime, submit_batch
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/src/invoiceiq/pipeline/batch.py", line 72, in <module>
+    invoice_queue = Queue(QUEUE_NAME, concurrency=BATCH_CONCURRENCY)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/home/soumit/workspace/agentic/p1_pydantic_ai_invoices/.venv/lib/python3.12/site-packages/dbos/_queue.py", line 110, in __init__
+    raise DBOSException(
+dbos._error.DBOSException: DBOS Error: Queue objects cannot be constructed directly. Declare a queue with DBOS.register_queue(name, ...) and look one up with DBOS.retrieve_queue(name).

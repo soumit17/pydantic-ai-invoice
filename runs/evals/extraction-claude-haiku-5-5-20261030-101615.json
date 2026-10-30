@@ -1,0 +1,66 @@
+{
+ "dataset": "extraction",
+ "model": "anthropic:claude-haiku-5-5",
+ "time": "2026-10-30T10:16:15",
+ "cases": 3,
+ "metrics": {
+  "field_accuracy": 1.0,
+  "kind_accuracy": 1.0,
+  "task_failures": 0.0
+ },
+ "cost_usd": "0.003118025",
+ "per_case": {
+  "inv-001": {
+   "field_accuracy": 1.0,
+   "supplier.name": 1.0,
+   "supplier.gstin": 1.0,
+   "buyer.gstin": 1.0,
+   "invoice_no": 1.0,
+   "invoice_date": 1.0,
+   "po_number": 1.0,
+   "currency": 1.0,
+   "subtotal": 1.0,
+   "total_tax": 1.0,
+   "total": 1.0,
+   "LineItemF1": 1.0,
+   "KindCorrect": true,
+   "MaxModelRequests": true,
+   "SpansCaptured": true
+  },
+  "inv-002": {
+   "field_accuracy": 1.0,
+   "supplier.name": 1.0,
+   "supplier.gstin": 1.0,
+   "buyer.gstin": 1.0,
+   "invoice_no": 1.0,
+   "invoice_date": 1.0,
+   "po_number": 1.0,
+   "currency": 1.0,
+   "subtotal": 1.0,
+   "total_tax": 1.0,
+   "total": 1.0,
+   "LineItemF1": 1.0,
+   "KindCorrect": true,
+   "MaxModelRequests": true,
+   "SpansCaptured": true
+  },
+  "inv-003": {
+   "field_accuracy": 1.0,
+   "supplier.name": 1.0,
+   "supplier.gstin": 1.0,
+   "buyer.gstin": 1.0,
+   "invoice_no": 1.0,
+   "invoice_date": 1.0,
+   "po_number": 1.0,
+   "currency": 1.0,
+   "subtotal": 1.0,
+   "total_tax": 1.0,
+   "total": 1.0,
+   "LineItemF1": 1.0,
+   "KindCorrect": true,
+   "MaxModelRequests": true,
+   "SpansCaptured": true
+  }
+ },
+ "failures": {}
+}

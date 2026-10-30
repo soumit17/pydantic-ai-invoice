@@ -1,0 +1,132 @@
+{
+  "stats": {
+    "off": {
+      "audits": 1,
+      "false_pos": 1,
+      "decisions_ok": 0,
+      "escalated": 0,
+      "reasoning": 0,
+      "output": 856,
+      "usd": "0.000986645"
+    },
+    "escalation": {
+      "audits": 1,
+      "false_pos": 0,
+      "decisions_ok": 1,
+      "escalated": 1,
+      "reasoning": 915,
+      "output": 2496,
+      "usd": "0.001922890"
+    },
+    "always": {
+      "audits": 1,
+      "false_pos": 0,
+      "decisions_ok": 1,
+      "escalated": 0,
+      "reasoning": 810,
+      "output": 1617,
+      "usd": "0.001134815"
+    }
+  },
+  "runs": [
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "off",
+      "false_positives": [
+        "price_drift"
+      ],
+      "decision": "awaiting_approval",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "warning",
+          "message": "Line 1 (Machine Maintenance Service) is billed at \u20b97813.05 against a PO unit price of \u20b97441.00, about 5.0% above the PO price.",
+          "evidence": [
+            {
+              "name": "invoice_unit_price",
+              "value": "7813.05"
+            },
+            {
+              "name": "po_unit_price",
+              "value": "7441.00"
+            },
+            {
+              "name": "drift_pct",
+              "value": "5.00%"
+            },
+            {
+              "name": "threshold_pct",
+              "value": "5.0%"
+            }
+          ]
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against PO-2026-0025. The machine maintenance line is billed at \u20b97,813.05 against a PO price of \u20b97,441.00, which is 5.0% above the PO and sits at the drift threshold, so a human should confirm it. The total is within the \u20b950,000 auto-approve limit, so the decision depends only on the price-drift review."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "escalation",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": "auditor disagrees with the rules: warning price_drift",
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at \u20b97,813.05 against a PO price of \u20b97,441.00, a 5.00% increase that sits exactly at the 5.0% threshold and is not above it.",
+          "evidence": [
+            {
+              "name": "invoice_unit_price",
+              "value": "7813.05"
+            },
+            {
+              "name": "po_unit_price",
+              "value": "7441.00"
+            },
+            {
+              "name": "drift_percent",
+              "value": "5.00"
+            }
+          ]
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (V002) has invoiced \u20b916,528.59 against open PO-2026-0025, and the vendor, GST treatment, arithmetic and posting history all check out. The only observation is that the machine maintenance line is exactly 5.00% above the PO price, which is at the threshold and needs no action. No warnings or critical issues were found, so the invoice can proceed."
+    },
+    {
+      "case": "inv-027",
+      "repeat": 0,
+      "mode": "always",
+      "false_positives": [],
+      "decision": "auto_approved",
+      "expected": "auto_approved",
+      "escalation": null,
+      "llm_findings": [
+        {
+          "kind": "price_drift",
+          "severity": "info",
+          "message": "Machine Maintenance Service is billed at 7813.05 against a PO price of 7441.00, a 5.0% increase that sits exactly at the 5.0% threshold, so it is not flagged as drift.",
+          "evidence": [
+            {
+              "name": "invoice_unit_price",
+              "value": "7813.05"
+            },
+            {
+              "name": "po_unit_price",
+              "value": "7441.00"
+            },
+            {
+              "name": "variance_pct",
+              "value": "5.00"
+            }
+          ]
+        }
+      ],
+      "narrative": "Maa Durga Packaging Udyog (active vendor V002) has invoiced \u20b916,528.59 against open PO-2026-0025, and the amount is within the \u20b950,000 auto-approve limit. The only observation is that the machine maintenance line is priced exactly 5.0% above the PO, which is at but not over the drift threshold. No duplicates, GST or arithmetic problems were found, so the invoice can be approved."
+    }
+  ]
+}

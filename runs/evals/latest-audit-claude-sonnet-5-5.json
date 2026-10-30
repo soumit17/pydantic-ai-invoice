@@ -1,0 +1,297 @@
+{
+ "dataset": "audit",
+ "model": "anthropic:claude-sonnet-5-5",
+ "time": "2026-10-30T10:26:12",
+ "cases": 39,
+ "metrics": {
+  "recall": 1.0,
+  "precision": 1.0,
+  "decision_accuracy": 1.0,
+  "task_failures": 0.0
+ },
+ "cost_usd": "0.685532000",
+ "per_case": {
+  "inv-001": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-002": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-003": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-004": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-005": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-006": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-007": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-008": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-009": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-010": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-011": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-012": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-013": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-014": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-015": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-016": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-017": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-018": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-019": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-020": {
+   "TrajectoryMatch": 0.8,
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-021": {
+   "TrajectoryMatch": 0.4,
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-022": {
+   "TrajectoryMatch": 0.8,
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-023": {
+   "TrajectoryMatch": 0.8,
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-024": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "ToolCorrectness": true,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-025": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "ToolCorrectness": true,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-026": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "ToolCorrectness": true,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-027": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-028": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-029": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-030": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-031": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-032": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-033": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-034": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-035": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-036": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "ToolCorrectness": true,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-037": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-038": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  },
+  "inv-039": {
+   "FindingRecall": 1.0,
+   "FindingPrecision": 1.0,
+   "DecisionMatch": true,
+   "MaxToolCalls": true,
+   "SpansCaptured": true
+  }
+ },
+ "failures": {}
+}

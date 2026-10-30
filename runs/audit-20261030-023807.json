@@ -1,0 +1,54 @@
+{
+  "model": "anthropic:claude-haiku-5-5",
+  "cost_usd": "0.000544080",
+  "rows": [
+    {
+      "file_id": "inv-038",
+      "category": "foreign_currency",
+      "currency": "USD",
+      "expected": [
+        "fx_unverified"
+      ],
+      "flagged": [
+        "fx_unverified"
+      ],
+      "llm_findings": [
+        {
+          "kind": "fx_unverified",
+          "severity": "warning",
+          "message": "Invoice is in USD (5,023.00 USD); converted at the reference rate for 2026-09-27 it is about \u20b94,21,932. The FX conversion is recorded here, but the rate should be confirmed before payment.",
+          "evidence": {
+            "usd_total": "5023.00",
+            "inr_equivalent": "421932.00",
+            "rate_date": "2026-09-27"
+          },
+          "source": "llm"
+        },
+        {
+          "kind": "math_error",
+          "severity": "info",
+          "message": "Line totals and subtotal are arithmetically consistent (3 x 1447 = 4341; 2 x 341 = 682; subtotal 5023). No tax is charged on a foreign vendor invoice, which is expected.",
+          "evidence": {},
+          "source": "llm"
+        }
+      ],
+      "decision": "awaiting_approval",
+      "expected_decision": "awaiting_approval",
+      "suggested": "needs_approval",
+      "narrative": "Lakeside Metrology Inc (vendor V014, active) has invoiced USD 5,023.00, which converts to approximately \u20b94,21,932 at the 27 Sep 2026 reference rate, well above the \u20b950,000 auto-approve limit. There is no PO for this invoice, and no duplicate was found among posted invoices (the search for invoice 292 returned nothing, and the vendor's recent invoices are 291 and 288, which differ). The only flag is the unverified FX amount, so the approver should confirm the rate and then approve the payment.",
+      "trajectory": [
+        "get_vendor",
+        "search_posted",
+        "load_capability(fx)",
+        "convert_to_inr",
+        "vendor_history"
+      ],
+      "fx_loaded": true,
+      "requests": 3,
+      "input_tokens": 10294,
+      "output_tokens": 838,
+      "cache_read_tokens": 10048,
+      "seconds": 5.98
+    }
+  ]
+}
