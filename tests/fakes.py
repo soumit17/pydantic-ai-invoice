@@ -8,7 +8,7 @@ import json
 import os
 import shutil
 import time
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Callable
 from dataclasses import dataclass, field
 from datetime import date
 from pathlib import Path
@@ -24,6 +24,7 @@ from pydantic_ai.messages import (
     ToolReturnPart,
     UserPromptPart,
 )
+from pydantic_ai.models import Model
 from pydantic_ai.models.function import AgentInfo, DeltaToolCall, DeltaToolCalls, FunctionModel
 from pydantic_ai.usage import RequestUsage
 
@@ -42,7 +43,9 @@ def runtime_settings(dataset: Path, root: Path) -> Settings:
     data = root / "data"
     data.mkdir(parents=True, exist_ok=True)
     shutil.copyfile(dataset / "ledger.sqlite", data / "ledger.sqlite")
-    return Settings(_env_file=None, data_dir=data, runs_dir=root / "runs", as_of_date=AS_OF)  # pyright: ignore[reportCallIssue]
+    return Settings(  # pyright: ignore[reportCallIssue]
+        _env_file=None, data_dir=data, runs_dir=root / "runs", as_of_date=AS_OF, online_eval_rate=0
+    )
 
 
 def truth(dataset: Path, file_id: str) -> GroundTruth:
@@ -87,9 +90,28 @@ class PosterCalls:
     seen_outcomes: list[str] = field(default_factory=lambda: [])
 
 
-def fake_poster(settings: Settings, calls: PosterCalls | None = None) -> PosterAgent:
+def fake_guard(answer: Callable[[str], str], prompts: list[str] | None = None) -> FunctionModel:
+    """The ApprovalReviewer's / ToolCallJudge's model: answer(instructions + prompt) returns 'yes',
+    'no' or 'unsure' (the instructions carry the question, which tells the two apart). Their
+    agents' output type is that Literal, as an output tool."""
+
+    def fn(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
+        prompt = next(p.content for p in messages[0].parts if isinstance(p, UserPromptPart))
+        assert isinstance(prompt, str)
+        prompt = f"{info.instructions}\n{prompt}"
+        if prompts is not None:
+            prompts.append(prompt)
+        return ModelResponse(parts=[ToolCallPart(info.output_tools[0].name, {"response": answer(prompt)})])
+
+    return FunctionModel(fn, model_name="fake-guard")
+
+
+def fake_poster(
+    settings: Settings, calls: PosterCalls | None = None, *, guards: Model | Literal[False] = False
+) -> PosterAgent:
     """Request 1: call post_to_ledger with the arguments from the prompt (pauses for approval).
-    Request 2: return the receipt, or a sentence if the call was denied."""
+    Request 2: return the receipt, or a sentence if the call was denied.
+    guards: a fake_guard model for the reviewer and the amount judge; off by default."""
     calls = calls or PosterCalls()
 
     def fn(messages: list[ModelMessage], info: AgentInfo) -> ModelResponse:
@@ -107,11 +129,12 @@ def fake_poster(settings: Settings, calls: PosterCalls | None = None) -> PosterA
             return ModelResponse(parts=[ToolCallPart("post_to_ledger", args)])
         ret = returns[0]
         calls.seen_outcomes.append(ret.outcome)
-        if ret.outcome == "success":
+        blocked = "tool_call_judge" in (ret.metadata or {})  # ToolCallJudge: a return, not a denial
+        if ret.outcome == "success" and not blocked:
             return ModelResponse(parts=[ToolCallPart(RECEIPT_TOOL, ret.model_response_object())])
         return ModelResponse(parts=[TextPart(f"Not posted: {ret.content}")])
 
-    return build_poster(settings, model=FunctionModel(fn))
+    return build_poster(settings, model=FunctionModel(fn), guards=guards)
 
 
 def fake_ask_ap(settings: Settings) -> AskAgent:

@@ -42,9 +42,9 @@ def _norm(text: str | None) -> str:
     return re.sub(r"[^a-z0-9]", "", (text or "").lower())
 
 
-def _same(a: object, b: object) -> bool:
+def _same(a: object, b: object, tolerance: Decimal = Decimal("0.01")) -> bool:
     if isinstance(a, Decimal | int | float) and isinstance(b, Decimal | int | float):
-        return abs(Decimal(str(a)) - Decimal(str(b))) < Decimal("0.01")
+        return abs(Decimal(str(a)) - Decimal(str(b))) < tolerance
     if isinstance(a, str) or isinstance(b, str):
         return _norm(str(a) if a is not None else None) == _norm(str(b) if b is not None else None)
     return a == b
@@ -61,9 +61,14 @@ def _line(li: LineItem, name: str) -> object:
     return getattr(li, name)
 
 
-def score(expected: RawInvoice | ExtractionFailure, got: RawInvoice | ExtractionFailure) -> FieldScore:
+def score(
+    expected: RawInvoice | ExtractionFailure,
+    got: RawInvoice | ExtractionFailure,
+    *,
+    tolerance: Decimal = Decimal("0.01"),
+) -> FieldScore:
     """Kind must match. For invoices, every header field and every line field counts once;
-    missing or extra lines count as wrong."""
+    missing or extra lines count as wrong. Amounts match within `tolerance` (the M8 evals use ±1)."""
     if isinstance(expected, ExtractionFailure) or isinstance(got, ExtractionFailure):
         ok = type(expected) is type(got)
         return FieldScore(kind_ok=ok, correct=int(ok), total=1, wrong=[] if ok else ["kind"])
@@ -72,7 +77,7 @@ def score(expected: RawInvoice | ExtractionFailure, got: RawInvoice | Extraction
 
     def check(label: str, want: object, have: object) -> None:
         result.total += 1
-        if _same(want, have):
+        if _same(want, have, tolerance):
             result.correct += 1
         else:
             result.wrong.append(f"{label}: want {want!r}, got {have!r}")

@@ -20,6 +20,7 @@ from pydantic_ai import DeferredToolRequests, ToolApproved, ToolDenied
 from pydantic_ai.tools import DeferredToolApprovalResult
 
 from invoiceiq.agents.poster import POST_LIMITS, PostDeps, PosterAgent, PostingContext, posting_request
+from invoiceiq.capabilities.guards import REVIEWER_USER
 from invoiceiq.models import InvoiceStatus, PostingReceipt
 from invoiceiq.repos.app_store import AppStore
 from invoiceiq.repos.ledger import LedgerRepo
@@ -42,17 +43,25 @@ class Resolution:
 
 async def request_posting(
     context: PostingContext, *, poster: PosterAgent, store: AppStore, ledger: LedgerRepo
-) -> None:
-    """Run the poster until it asks to call post_to_ledger, then park the paused Conversation."""
+) -> PostingReceipt | None:
+    """Run the poster until it asks to call post_to_ledger, then park the paused Conversation.
+
+    Returns None once parked, or the receipt if the ApprovalReviewer approved the call on a
+    person's behalf (M8): the call then runs in this same run and nothing is left to park.
+    """
     result = await poster.run(
         posting_request(context),
-        deps=PostDeps(ledger=ledger, context=context, posted_by="(not yet approved)"),
+        # Only the reviewer can approve within this first run, so a posting made here is its.
+        deps=PostDeps(ledger=ledger, context=context, posted_by=REVIEWER_USER),
         usage_limits=POST_LIMITS,
         metadata={"invoice_id": context.invoice_ref},
     )
     if not isinstance(result.output, DeferredToolRequests):
+        if receipt := await _receipt(ledger, context.idempotency_key):
+            return receipt
         raise ApprovalError(f"the poster did not ask to post {context.invoice_ref}: {result.output!r}")
     await store.save_pending(context, result.conversation)
+    return None
 
 
 async def resolve(

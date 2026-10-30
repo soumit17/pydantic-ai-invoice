@@ -46,6 +46,8 @@ class Settings(BaseSettings):
     mcp_url: str | None = None
     # Re-run the auditor once with Thinking() when it disagrees with the rules (M6, D19).
     audit_escalation: bool = True
+    # Share of auditor runs evaluated online (M8). 0 turns it off; tests use 1.0 or 0.
+    online_eval_rate: float = 0.2
     # At most this many model requests in flight at once, across all agents (M7).
     model_concurrency: int = 4
     # Seconds: one model request (all SDK retries included), and one whole agent run (M7).

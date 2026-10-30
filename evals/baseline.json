@@ -1,0 +1,53 @@
+{
+ "audit/claude-haiku-5-5": {
+  "cases": 39,
+  "cost_usd": "0.030307610",
+  "metrics": {
+   "decision_accuracy": 1.0,
+   "precision": 1.0,
+   "recall": 1.0,
+   "task_failures": 0.0
+  },
+  "time": "2026-10-30T10:19:01"
+ },
+ "audit/claude-sonnet-5-5": {
+  "cases": 39,
+  "cost_usd": "0.685532000",
+  "metrics": {
+   "decision_accuracy": 1.0,
+   "precision": 1.0,
+   "recall": 1.0,
+   "task_failures": 0.0
+  },
+  "time": "2026-10-30T10:26:12"
+ },
+ "extraction/claude-haiku-5-5": {
+  "cases": 40,
+  "cost_usd": "0.028260000",
+  "metrics": {
+   "field_accuracy": 1.0,
+   "kind_accuracy": 1.0,
+   "task_failures": 0.0
+  },
+  "time": "2026-10-30T10:17:43"
+ },
+ "extraction/claude-sonnet-5-5": {
+  "cases": 40,
+  "cost_usd": "0.588006400",
+  "metrics": {
+   "field_accuracy": 1.0,
+   "kind_accuracy": 1.0,
+   "task_failures": 0.0
+  },
+  "time": "2026-10-30T10:23:13"
+ },
+ "narrative/claude-haiku-5-5": {
+  "cases": 10,
+  "cost_usd": "0.007506320",
+  "metrics": {
+   "four_sentences_rate": 1.0,
+   "narrative_pass_rate": 0.8
+  },
+  "time": "2026-10-30T10:21:05"
+ }
+}

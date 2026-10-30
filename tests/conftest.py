@@ -27,7 +27,7 @@ models.ALLOW_MODEL_REQUESTS = False
 def settings(tmp_path: Path) -> Iterator[Settings]:
     """Settings with data and run folders redirected into a temp dir, so tests never touch real files."""
     get_settings.cache_clear()
-    s = Settings(_env_file=None, data_dir=tmp_path / "data", runs_dir=tmp_path / "runs")  # pyright: ignore[reportCallIssue]
+    s = Settings(_env_file=None, data_dir=tmp_path / "data", runs_dir=tmp_path / "runs", online_eval_rate=0)  # pyright: ignore[reportCallIssue]
     yield s
     get_settings.cache_clear()
 

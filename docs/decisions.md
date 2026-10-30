@@ -531,3 +531,95 @@ The first live `crash_test.py --live` failed: 3 invoices `failed`, plus a report
 
 Lesson: a fake that never takes a branch doesn't test that branch durably. Every behavior that changes
 how an agent is *called* (per-run capabilities, settings, toolsets) needs one fake path in the crash test.
+
+## D23 — M8: evals, online evaluation and the Harness (2026-10-30)
+
+**Added `pydantic-ai-harness==0.63.0`** (spec §19.2 allows it in M8). Pinned exactly because it's 0.x;
+it pins `pydantic-ai-slim==2.63.0` itself, so the two move together.
+
+**Evals (`evals/`).** There are three `pydantic_evals` datasets.
+- **Custom case evaluators:** FieldAccuracy (±₹1), LineItemF1, KindCorrect, FindingRecall,
+  FindingPrecision and DecisionMatch.
+- **Built-in evaluators:** MaxModelRequests, ToolCorrectness, TrajectoryMatch, MaxToolCalls and LLMJudge.
+- **Headline metrics** come from `ReportEvaluator`s as `ScalarResult`s, micro-averaged over all
+  findings or fields. `evals.compare` gates on them against `evals/baseline.json`; a drop of more than
+  3 points, or any new task failure, fails the gate.
+- **Span capture is enforced, not assumed.** A `SpansCaptured` evaluator runs on every case, and the
+  run exits non-zero if any case has no model-request spans. Without that, the agentic evaluators
+  score 0 silently.
+
+**Changes from the spec:**
+1. ToolCorrectness and TrajectoryMatch are attached per case, because they only make sense where the
+   right investigation is known. TrajectoryMatch expects `get_vendor → search_posted` in order,
+   which is what the live M6 trails show the auditor doing.
+2. The audit eval scores the decision path: rules, then the auditor with escalation, then the merge,
+   then the policy. The auditor alone isn't scored, because the rules hand it their findings as facts.
+3. Each dataset's expected output uses the task's output type (`AuditResult` with only `flagged` and
+   `decision` filled), because `Dataset[I, O, M]` types `expected_output` as `O`.
+
+**OnlineEvaluation on the auditor.** It samples 20% of runs (`ONLINE_EVAL_RATE`) and runs
+MaxToolCalls(8) and NarrativeNotEmpty. Results arrive as `gen_ai.evaluation.result` OTel log
+events; `tests/test_online_eval.py` captures them with `capfire`.
+- Tests use a rate of 0, so no background evaluations run at random.
+- It also works inside the DBOS batch. The fake crash test passes with it on.
+
+**ApprovalReviewer and ToolCallJudge on the poster.** They give a second, cheap model opposite
+powers.
+- **The reviewer only approves.** Its selector limits it to `awaiting_approval` invoices with no
+  findings: the high-value-but-clean tier. It sees the conversation, because the call's arguments
+  don't name the vendor. When it approves, the call runs in the same run, `request_posting` returns
+  the receipt, and the ledger's `posted_by` is `approval-reviewer`.
+  *It protects against approval fatigue*, where people rubber-stamp routine high-value postings.
+- **The judge only blocks, and only overposting.** You chose this, so partial postings still work.
+  It runs at execution time, after any approval, on the edited arguments. It fails *open*
+  (`on_uncertain="allow"`), because `post_to_ledger` already refuses `amount > total` in code, which
+  is the hard boundary; failing closed would turn a judge outage into denied postings. A blocked
+  call comes back as an ordinary tool return carrying `metadata["tool_call_judge"]`, not as a
+  `denied` outcome.
+  *It protects against a model, or tampered history, changing the amount* between the request and
+  the posting.
+- **Their own model requests are invisible to the host agent's capabilities.** Their tokens join the
+  run's usage, but neither our `CostHooks` nor `SpendLimits` sees them, because each Harness
+  capability builds its own internal agent. `CostRecordingModel`, a `WrapperModel`, records them;
+  it's the only part of those agents we choose. The same applies to `LLMJudge`. Every guard model
+  sets `max_tokens=256` and `thinking=False`.
+- `POST_LIMITS.request_limit` goes from 4 to 6, because the guards claim requests from the same run
+  usage.
+
+**SpendLimits vs CostHooks.** `tests/test_spend_limits.py` compares them; CostHooks stays the
+project's meter.
+- **Same dollars.** Both price with genai-prices and record the same totals.
+- **SpendLimits is a brake.** It checks before every *request*, so it stops a run partway through.
+  CostHooks checks the project total before each *run* only.
+- **SpendLimits' accrual is a durable operation.** A DBOS replay counts each response once on its
+  own. CostHooks needed D22's `provider_response_id` deduplication to do the same.
+- **Where its counters live.** SpendLimits keeps them in a store: in-memory by default, or Redis or
+  Postgres to share across processes. This project shares one SQLite or file ledger across the CLI,
+  API and batch workers, which neither shipped store covers.
+- **Verdict:** keep CostHooks as the ledger and cap. Reach for SpendLimits when you need per-tenant,
+  per-day or per-run brakes, with Redis or Postgres underneath.
+
+**StepPersistence: not adopted.** DBOS already checkpoints every step, and we persist the poster's
+pause as a `Conversation`. StepPersistence saves message-history snapshots at settled steps. That
+would duplicate DBOS for crash recovery and the `Conversation` for pauses, so there's no gap for it
+to fill here.
+
+**Live results (2026-10-30).** The baseline was accepted for Haiku.
+
+| Dataset | Haiku | Sonnet | Cost (Haiku / Sonnet) |
+|---|---|---|---|
+| extraction (40) | field 1.00, kind 1.00 | field 1.00, kind 1.00 | $0.028 / $0.588 (21×) |
+| audit (39) | recall 1.00, precision 1.00, decisions 1.00 | identical | $0.030 / $0.686 (23×) |
+| narrative (10, Haiku judge) | judge pass 0.80, ≤4 sentences 1.00 | — | $0.0075 |
+
+- **Haiku vs Sonnet:** on this corpus Sonnet buys nothing for about 22× the cost. Haiku stays the default.
+- **Lesson: `TrajectoryMatch(order="in_order")` is an F1 score, not an ordering check.** It takes the
+  longest common subsequence, and every extra tool call lowers precision.
+  - `[get_vendor, get_po, search_posted]` against `[get_vendor, search_posted]` scores 0.8.
+  - A thorough 8-call investigation scores 0.4, even though the auditor did the right thing.
+  - It's diagnostic only and not gated. To ask "did X happen before Y?", match exactly the tools
+    you expect (`order="exact"`) or write a subsequence evaluator.
+- **Open:** the eval report's `requests` and token metrics are double the cost ledger's for live
+  Anthropic runs: 2 `chat` spans per real request. Its `cost` metric matches the ledger, and
+  `FunctionModel` runs show 1 span, so the second span comes from the live client path. The headline
+  metrics are computed from outputs and aren't affected. Check it in M9 with one Logfire trace.

@@ -303,6 +303,7 @@ async def _posting_context(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> P
         # new id still maps to the same key, so the ledger can't post it twice.
         idempotency_key=key,
         decision=ctx.inputs.outcome,
+        findings=sorted({f.kind for f in ctx.state.findings if f.severity != "info"}),
     )
 
 
@@ -316,7 +317,11 @@ async def post(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> InvoiceRecord
         # One step. If it's interrupted, all of it re-runs: request_posting re-parks (resetting a
         # stale claim) and post_to_ledger's idempotency key returns the first posting, not a second.
         context = await _posting_context(ctx)
-        await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
+        if receipt := await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger):
+            # Not expected (the reviewer only answers the needs-approval tier), but already posted.
+            record = _record(ctx, status="posted", receipt=receipt)
+            await d.store.save_invoice(record)
+            return record
         record = _record(ctx, status="awaiting_approval")
         await d.store.save_invoice(record)
         resolution = await resolve(
@@ -341,9 +346,12 @@ async def park(ctx: Ctx[PipelineState, PipelineDeps, Decision]) -> InvoiceRecord
 
     async def park_for_approval() -> InvoiceRecord:
         context = await _posting_context(ctx)
-        await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
-        status = "held" if ctx.inputs.outcome == "held" else "awaiting_approval"
-        record = _record(ctx, status=status)
+        receipt = await request_posting(context, poster=d.poster, store=d.store, ledger=d.ledger)
+        if receipt is not None:  # the ApprovalReviewer approved it on a person's behalf (M8)
+            record = _record(ctx, status="posted", receipt=receipt)
+        else:
+            status = "held" if ctx.inputs.outcome == "held" else "awaiting_approval"
+            record = _record(ctx, status=status)
         await d.store.save_invoice(record)
         return record
 

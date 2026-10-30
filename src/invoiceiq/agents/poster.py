@@ -13,15 +13,17 @@ import json
 from dataclasses import dataclass
 from datetime import date
 from decimal import Decimal
+from typing import Literal
 
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 from pydantic_ai import Agent, DeferredToolRequests, ModelRetry, RunContext, ToolOutput
-from pydantic_ai.capabilities import Caching, Thinking
+from pydantic_ai.capabilities import AbstractCapability, Caching, Thinking
 from pydantic_ai.models import Model
 from pydantic_ai.settings import ModelSettings
 from pydantic_ai.usage import UsageLimits
 
 from invoiceiq.capabilities.cost import build_cost_hooks
+from invoiceiq.capabilities.guards import build_amount_judge, build_reviewer, guard_model
 from invoiceiq.config import Settings
 from invoiceiq.models import DecisionOutcome, PostingReceipt
 from invoiceiq.reliability import build_model
@@ -30,7 +32,8 @@ from invoiceiq.repos.ledger import LedgerRepo
 PosterAgent = Agent["PostDeps", PostingReceipt | DeferredToolRequests | str]
 
 # Request 1: the model calls post_to_ledger (deferred). Request 2, after approval: it returns the receipt.
-POST_LIMITS = UsageLimits(request_limit=4, tool_calls_limit=2)
+# The reviewer's and judge's requests count against the same run usage (M8), hence the headroom.
+POST_LIMITS = UsageLimits(request_limit=6, tool_calls_limit=2)
 RECEIPT_TOOL = "return_receipt"
 
 
@@ -48,6 +51,9 @@ class PostingContext(BaseModel):
     content_hash: str
     idempotency_key: str
     decision: DecisionOutcome
+    # Kinds of the warning/critical findings behind the decision. Empty for an invoice that needs
+    # approval only for its amount, which is the tier the ApprovalReviewer may answer (M8).
+    findings: list[str] = Field(default_factory=list[str])
 
 
 @dataclass
@@ -81,7 +87,18 @@ def posting_request(context: PostingContext) -> str:
     )
 
 
-def build_poster(settings: Settings, *, model: Model | str | None = None) -> PosterAgent:
+def build_poster(
+    settings: Settings, *, model: Model | str | None = None, guards: Model | Literal[False] | None = None
+) -> PosterAgent:
+    """guards: the model for the Harness reviewer and amount judge. None: Haiku (production);
+    False: no guards (most tests, whose fake poster has no second model to ask)."""
+    guard_caps: list[AbstractCapability[PostDeps]] = []
+    if guards is not False:
+        # Production: one wrapped Haiku each, so the cost ledger tells them apart.
+        guard_caps = [
+            build_reviewer(guards or guard_model(settings, "approval_reviewer")),
+            build_amount_judge(guards or guard_model(settings, "amount_judge")),
+        ]
     agent: PosterAgent = Agent(
         model or build_model(settings, settings.model_dev),
         deps_type=PostDeps,
@@ -96,7 +113,14 @@ def build_poster(settings: Settings, *, model: Model | str | None = None) -> Pos
         description="Posts an approved invoice to the ledger (the call itself needs approval).",
         instructions=INSTRUCTIONS,
         model_settings=ModelSettings(max_tokens=512, request_timeout=settings.request_timeout),
-        capabilities=[Caching(), Thinking(effort=False), build_cost_hooks(settings)],
+        capabilities=[
+            Caching(),
+            Thinking(effort=False),
+            build_cost_hooks(settings),
+            # A second model on each side of the approval (spec §10.3): the reviewer can only approve,
+            # the judge can only block. See capabilities/guards.py.
+            *guard_caps,
+        ],
     )
 
     @agent.tool(requires_approval=True)

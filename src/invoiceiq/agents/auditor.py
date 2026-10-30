@@ -29,6 +29,7 @@ from invoiceiq.capabilities.fx import fx_capability
 from invoiceiq.capabilities.ledger import ledger_capability
 from invoiceiq.config import Settings
 from invoiceiq.models import AuditFinding, AuditReport, Finding, RawInvoice
+from invoiceiq.online_evals import auditor_online_evaluation
 from invoiceiq.policy import Policy
 from invoiceiq.reliability import build_model
 from invoiceiq.repos.ledger import LedgerRepo, open_ledger
@@ -111,6 +112,8 @@ def build_auditor(
             build_cost_hooks(settings),
             ledger_capability,  # tools + their usage instructions, always loaded
             fx_capability,  # deferred: only a catalog line until the model loads it
+            # Background quality checks on a sample of real runs, as OTel events (M8).
+            *([auditor_online_evaluation(settings.online_eval_rate)] if settings.online_eval_rate else []),
             *([DBOSDurability()] if durable else []),  # model requests as DBOS steps (M7)
         ],
     )

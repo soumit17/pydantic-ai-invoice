@@ -30,6 +30,28 @@ Before the fix (thinking on, max_tokens 2048 truncating): tool 10/10, 3 retries,
 | escalation | 12 | 0 | 12/12 | 3 | 236 | $0.00083 |
 | always | 12 | 0 | 12/12 | 0 | 695 | $0.00097 |
 
+## M8 evals: Haiku vs Sonnet (`uv run python -m evals.<name>`, then `--final`)
+
+| Dataset | Metric | Haiku | Sonnet | Δ |
+|---|---|---|---|---|
+| extraction (40) | field_accuracy | | | |
+| extraction (40) | kind_accuracy | | | |
+| extraction (40) | cost | | | |
+| audit (36) | recall | | | |
+| audit (36) | precision | | | |
+| audit (36) | decision_accuracy | | | |
+| audit (36) | cost | | | |
+| narrative (10) | narrative_pass_rate (LLM judge) | | | |
+| narrative (10) | four_sentences_rate (plain rule) | | | |
+
+Accuracy delta vs cost delta: is Sonnet worth it for either agent?
+
+## M8 Harness guards
+
+- ApprovalReviewer protects against: …
+- ToolCallJudge protects against: …
+- Where the LLM judge and the deterministic `amount <= total` check overlap, which would you keep?
+
 ## Questions
 
 1. When did validation-as-retry help, and when did it hide real problems? (§7.1)
